@@ -6,213 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항</title>
     <link rel="stylesheet" href="/css/layout.css">
-    <style>
-        .noticeCard {
-            background-color: #f5f5f5;
-            border-radius: clamp(8px, 2vw, 12px);
-            padding: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .noticeHeader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .noticeHeader h3 {
-            margin: 0;
-            color: #333;
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .searchBox {
-            display: flex;
-            gap: 0.5rem;
-            flex: 1;
-            max-width: 400px;
-        }
-
-        .searchBox input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
-        .searchBox button {
-            padding: 0.75rem 1.5rem;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btnWrite {
-            padding: 0.75rem 1.5rem;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btnWrite:hover {
-            background-color: #229954;
-        }
-
-        .noticeTable {
-            width: 100%;
-            background-color: white;
-            border-radius: clamp(6px, 1vw, 8px);
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .noticeTable table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .noticeTable th,
-        .noticeTable td {
-            padding: clamp(0.75rem, 2vw, 1rem);
-            text-align: left;
-            border-bottom: 1px solid #ecf0f1;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-        }
-
-        .noticeTable th {
-            background-color: #34495e;
-            color: white;
-            font-weight: 600;
-        }
-
-        .noticeTable tbody tr {
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .noticeTable tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .noticeTable tbody tr.important {
-            background-color: #fff3cd;
-        }
-
-        .noticeTable tbody tr.important:hover {
-            background-color: #ffe69c;
-        }
-
-        .importantBadge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-right: 0.5rem;
-        }
-
-        .noticeTitle {
-            color: #333;
-            font-weight: 500;
-        }
-
-        .viewCount {
-            color: #999;
-            font-size: 0.85rem;
-        }
-
-        .noData {
-            text-align: center;
-            padding: 3rem;
-            color: #999;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .pagination button {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #ddd;
-            background-color: white;
-            color: #333;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .pagination button:hover:not(:disabled) {
-            background-color: #3498db;
-            color: white;
-            border-color: #3498db;
-        }
-
-        .pagination button.active {
-            background-color: #3498db;
-            color: white;
-            border-color: #3498db;
-            font-weight: 600;
-        }
-
-        .pagination button:disabled {
-            background-color: #f5f5f5;
-            color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .pagination .pageInfo {
-            color: #666;
-            font-size: 0.9rem;
-            padding: 0 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .noticeHeader {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .searchBox {
-                max-width: 100%;
-            }
-
-            .noticeTable {
-                overflow-x: auto;
-            }
-
-            .noticeTable th:nth-child(3),
-            .noticeTable td:nth-child(3),
-            .noticeTable th:nth-child(4),
-            .noticeTable td:nth-child(4) {
-                display: none;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/notice.css">
 </head>
 
-<body>
+<body class="noticePage">
     <section class="layoutSection">
         <!-- 모바일 메뉴 토글 -->
         <button class="menuToggle" onclick="toggleSidebar()">☰</button>
@@ -257,7 +54,7 @@
                                    onkeypress="handleSearchEnter(event)">
                             <button onclick="searchNotices()">🔍 검색</button>
                         </div>
-                        <a href="/notice/write" class="btnWrite bossOnly" id="btnWrite" style="display: none;">
+                        <a href="/noticeWrite" class="btnWrite bossOnly" id="btnWrite" style="display: none;">
                             ✍️ 작성하기
                         </a>
                     </div>
@@ -452,7 +249,7 @@
 
         // 공지사항 상세보기
         function viewNotice(noticeNo) {
-            window.location.href = `/notice/write?noticeNo=${noticeNo}&mode=view`;
+            window.location.href = `/noticeWrite?noticeNo=${noticeNo}&mode=view`;
         }
 
         // 검색

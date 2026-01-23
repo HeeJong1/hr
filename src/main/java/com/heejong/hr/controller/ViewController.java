@@ -71,8 +71,8 @@ public class ViewController {
         return "notice";
     }
 
-    @GetMapping("/notice/write")
+    @GetMapping("/noticeWrite")
     public String noticeWritePage() {
-        return "notice-write";
+        return "noticeWrite";
     }
 }
