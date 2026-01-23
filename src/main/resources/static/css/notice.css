@@ -1,0 +1,204 @@
+/* notice.css - 공지사항 페이지 스타일 */
+
+.noticePage .noticeCard {
+    background-color: #f5f5f5;
+    border-radius: clamp(8px, 2vw, 12px);
+    padding: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.noticePage .noticeHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.noticePage .noticeHeader h3 {
+    margin: 0;
+    color: #333;
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+
+.noticePage .searchBox {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 400px;
+}
+
+.noticePage .searchBox input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.noticePage .searchBox button {
+    padding: 0.75rem 1.5rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.noticePage .btnWrite {
+    padding: 0.75rem 1.5rem;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.noticePage .btnWrite:hover {
+    background-color: #229954;
+}
+
+.noticePage .noticeTable {
+    width: 100%;
+    background-color: white;
+    border-radius: clamp(6px, 1vw, 8px);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.noticePage .noticeTable table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.noticePage .noticeTable th,
+.noticePage .noticeTable td {
+    padding: clamp(0.75rem, 2vw, 1rem);
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+}
+
+.noticePage .noticeTable th {
+    background-color: #34495e;
+    color: white;
+    font-weight: 600;
+}
+
+.noticePage .noticeTable tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.noticePage .noticeTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.noticePage .noticeTable tbody tr.important {
+    background-color: #fff3cd;
+}
+
+.noticePage .noticeTable tbody tr.important:hover {
+    background-color: #ffe69c;
+}
+
+.noticePage .importantBadge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.noticePage .noticeTitle {
+    color: #333;
+    font-weight: 500;
+}
+
+.noticePage .viewCount {
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.noticePage .noData {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+}
+
+.noticePage .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.noticePage .pagination button {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    background-color: white;
+    color: #333;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.noticePage .pagination button:hover:not(:disabled) {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.noticePage .pagination button.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+    font-weight: 600;
+}
+
+.noticePage .pagination button:disabled {
+    background-color: #f5f5f5;
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.noticePage .pagination .pageInfo {
+    color: #666;
+    font-size: 0.9rem;
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .noticePage .noticeHeader {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .noticePage .searchBox {
+        max-width: 100%;
+    }
+
+    .noticePage .noticeTable {
+        overflow-x: auto;
+    }
+
+    .noticePage .noticeTable th:nth-child(3),
+    .noticePage .noticeTable td:nth-child(3),
+    .noticePage .noticeTable th:nth-child(4),
+    .noticePage .noticeTable td:nth-child(4) {
+        display: none;
+    }
+}

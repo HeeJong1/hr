@@ -1,0 +1,163 @@
+/* noticeWrite.css - 공지사항 작성/수정 페이지 스타일 */
+
+.noticeWritePage .noticeCard {
+    background-color: #f5f5f5;
+    border-radius: clamp(8px, 2vw, 12px);
+    padding: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.noticeWritePage .noticeCard h3 {
+    color: #333;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+
+.noticeWritePage .formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.noticeWritePage .formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 600;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.noticeWritePage .formGroup input[type="text"],
+.noticeWritePage .formGroup textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+.noticeWritePage .formGroup input[type="text"]:focus,
+.noticeWritePage .formGroup textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.noticeWritePage .formGroup textarea {
+    min-height: 300px;
+    resize: vertical;
+}
+
+.noticeWritePage .checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.noticeWritePage .checkboxGroup input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.noticeWritePage .checkboxGroup label {
+    margin: 0;
+    cursor: pointer;
+}
+
+.noticeWritePage .buttonGroup {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.noticeWritePage .btnSubmit,
+.noticeWritePage .btnCancel,
+.noticeWritePage .btnDelete,
+.noticeWritePage .btnEdit {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.noticeWritePage .btnSubmit {
+    background-color: #3498db;
+    color: white;
+}
+
+.noticeWritePage .btnSubmit:hover {
+    background-color: #2980b9;
+}
+
+.noticeWritePage .btnCancel {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.noticeWritePage .btnCancel:hover {
+    background-color: #7f8c8d;
+}
+
+.noticeWritePage .btnDelete {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.noticeWritePage .btnDelete:hover {
+    background-color: #c0392b;
+}
+
+.noticeWritePage .btnEdit {
+    background-color: #f39c12;
+    color: white;
+}
+
+.noticeWritePage .btnEdit:hover {
+    background-color: #e67e22;
+}
+
+.noticeWritePage .noticeView {
+    background-color: white;
+    padding: clamp(1.5rem, 4vw, 2rem);
+    border-radius: clamp(6px, 1vw, 8px);
+}
+
+.noticeWritePage .noticeViewTitle {
+    font-size: clamp(1.3rem, 3vw, 1.6rem);
+    color: #333;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.noticeWritePage .noticeViewMeta {
+    display: flex;
+    gap: 1.5rem;
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.noticeWritePage .noticeViewContent {
+    line-height: 1.8;
+    color: #333;
+    font-size: 1rem;
+    min-height: 200px;
+    padding: 1rem 0;
+    white-space: pre-wrap;
+}
+
+.noticeWritePage .importantBadge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
