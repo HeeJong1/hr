@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연차관리</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <style>
+        .leaveCard {
+            background-color: #f5f5f5;
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaveCard h3 {
+            color: #333;
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+        }
+
+        .leaveStats {
+            display: flex;
+            gap: clamp(1rem, 3vw, 2rem);
+            flex-wrap: wrap;
+            margin-bottom: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        .statBox {
+            flex: 1;
+            min-width: clamp(150px, 30vw, 200px);
+            background-color: white;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            border-radius: clamp(6px, 1vw, 8px);
+            border-left: 4px solid #3498db;
+        }
+
+        .statLabel {
+            color: #7f8c8d;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .statValue {
+            color: #2c3e50;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: bold;
+        }
+
+        .leaveForm {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .formGroup {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .formGroup label {
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .formGroup input,
+        .formGroup select,
+        .formGroup textarea {
+            padding: clamp(0.75rem, 2vw, 1rem);
+            border: 2px solid #ddd;
+            border-radius: clamp(4px, 1vw, 6px);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            background-color: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .formGroup input:focus,
+        .formGroup select:focus,
+        .formGroup textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .formGroup textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .dateGroup {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .dateGroup .formGroup {
+            flex: 1;
+            min-width: clamp(150px, 40vw, 200px);
+        }
+
+        .btnSubmit {
+            padding: clamp(0.875rem, 2vw, 1rem);
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: clamp(6px, 1vw, 8px);
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btnSubmit:hover {
+            background-color: #2980b9;
+        }
+
+        .leaveHistory {
+            margin-top: clamp(2rem, 5vw, 3rem);
+        }
+
+        .leaveTable {
+            width: 100%;
+            background-color: white;
+            border-radius: clamp(6px, 1vw, 8px);
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .leaveTable table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaveTable th,
+        .leaveTable td {
+            padding: clamp(0.75rem, 2vw, 1rem);
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+        }
+
+        .leaveTable th {
+            background-color: #34495e;
+            color: white;
+            font-weight: 600;
+        }
+
+        .leaveTable tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .statusBadge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            font-weight: 600;
+        }
+
+        .statusBadge.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .statusBadge.approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .statusBadge.rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .btnCancel {
+            padding: 0.4rem 0.8rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btnCancel:hover {
+            background-color: #c82333;
+        }
+
+        .btnCancel:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .leaveTable {
+                overflow-x: auto;
+            }
+
+            .dateGroup {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="layoutSection">
+        <!-- 모바일 메뉴 토글 -->
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <h2>HR 시스템</h2>
+            </div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem active">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem">💰 급여관리</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="mainContent">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1>연차관리</h1>
+                <div class="userInfo">
+                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <span id="userName">사용자</span>
+                    </a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+
+            <!-- 컨텐츠 -->
+            <main class="content">
+                <!-- 연차 현황 -->
+                <div class="leaveCard">
+                    <h3>내 연차 현황</h3>
+                    <div class="leaveStats">
+                        <div class="statBox">
+                            <div class="statLabel">총 연차</div>
+                            <div class="statValue" id="totalDays">-</div>
+                        </div>
+                        <div class="statBox">
+                            <div class="statLabel">사용한 연차</div>
+                            <div class="statValue" id="usedDays">-</div>
+                        </div>
+                        <div class="statBox">
+                            <div class="statLabel">남은 연차</div>
+                            <div class="statValue" id="remainingDays">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 연차 신청 -->
+                <div class="leaveCard">
+                    <h3>연차 신청</h3>
+                    <form class="leaveForm" id="leaveForm">
+                        <div class="formGroup">
+                            <label for="leaveType">연차 종류</label>
+                            <select id="leaveType" name="leaveType" required>
+                                <option value="">선택하세요</option>
+                                <option value="annual">연차</option>
+                                <option value="half">반차</option>
+                                <option value="sick">병가</option>
+                            </select>
+                        </div>
+
+                        <div class="dateGroup">
+                            <div class="formGroup">
+                                <label for="startDate">시작일</label>
+                                <input type="date" id="startDate" name="startDate" required>
+                            </div>
+                            <div class="formGroup">
+                                <label for="endDate">종료일</label>
+                                <input type="date" id="endDate" name="endDate" required>
+                            </div>
+                        </div>
+
+                        <div class="formGroup">
+                            <label for="reason">사유</label>
+                            <textarea id="reason" name="reason" placeholder="연차 사유를 입력하세요" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btnSubmit">신청하기</button>
+                    </form>
+                </div>
+
+                <!-- 연차 내역 -->
+                <div class="leaveHistory">
+                    <div class="leaveCard">
+                        <h3>연차 신청 내역</h3>
+                        <div class="leaveTable">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>신청일</th>
+                                        <th>종류</th>
+                                        <th>기간</th>
+                                        <th>일수</th>
+                                        <th>상태</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="leaveHistoryBody">
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 2rem; color: #999;">
+                                            연차 신청 내역을 불러오는 중...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 푸터 -->
+            <footer class="footer">
+                <div class="footerContent">
+                    <div>
+                        <strong>HR Management System</strong>
+                        <p>인사관리 시스템</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    © 2024 HR Management System. All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <script>
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('memberNo');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                alert('로그아웃되었습니다.');
+                window.location.href = '/login';
+            }
+        }
+
+        // 페이지 로드 시 토큰 확인
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login';
+                return;
+            }
+
+            // 사용자 이름 표시
+            const userName = localStorage.getItem('userName') || '홍길동';
+            const userRole = localStorage.getItem('userRole') || 'ROLE_USER';
+
+            document.getElementById('userName').textContent = userName;
+
+            // BOSS일 경우 관리자 메뉴 표시
+            if (userRole === 'ROLE_BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => {
+                    item.classList.add('show');
+                });
+            }
+
+            // 연차 정보 로드
+            loadLeaveInfo();
+        });
+
+        // 연차 정보 로드
+        async function loadLeaveInfo() {
+            const memberNo = localStorage.getItem('memberNo');
+
+            if (!memberNo) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/leave/member/${memberNo}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    // 연차 현황 업데이트
+                    document.getElementById('totalDays').textContent = data.totalDays + '일';
+                    document.getElementById('usedDays').textContent = data.usedDays + '일';
+                    document.getElementById('remainingDays').textContent = data.remainingDays + '일';
+
+                    // 연차 내역 업데이트
+                    const tbody = document.getElementById('leaveHistoryBody');
+                    if (data.leaveRequests && data.leaveRequests.length > 0) {
+                        tbody.innerHTML = data.leaveRequests.map(req => {
+                            const statusBadgeClass = req.status === 'pending' ? 'pending' :
+                                req.status === 'approved' ? 'approved' : 'rejected';
+                            const statusText = req.status === 'pending' ? '대기' :
+                                req.status === 'approved' ? '승인' : '반려';
+
+                            const leaveTypeText = req.leaveType === 'annual' ? '연차' :
+                                req.leaveType === 'half' ? '반차' : '병가';
+
+                            // 대기 상태일 때만 취소 버튼 표시
+                            const actionButton = req.status === 'pending' ?
+                                `<button class="btnCancel" onclick="cancelLeaveRequest(${req.leaveRequestNo})">취소</button>` :
+                                '-';
+
+                            return `
+                                <tr>
+                                    <td>${new Date(req.requestDate).toLocaleDateString()}</td>
+                                    <td>${leaveTypeText}</td>
+                                    <td>${req.startDate}${req.startDate !== req.endDate ? ' ~ ' + req.endDate : ''}</td>
+                                    <td>${req.days}일</td>
+                                    <td><span class="statusBadge ${statusBadgeClass}">${statusText}</span></td>
+                                    <td>${actionButton}</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem; color: #999;">
+                                    신청한 연차 내역이 없습니다.
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const tbody = document.getElementById('leaveHistoryBody');
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: #d32f2f;">
+                            연차 내역을 불러오는데 실패했습니다.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // 연차 신청 취소
+        async function cancelLeaveRequest(leaveRequestNo) {
+            if (!confirm('휴가를 취소하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/leave/${leaveRequestNo}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('연차 신청이 취소되었습니다.');
+                    // 목록 새로고침
+                    await loadLeaveInfo();
+                } else {
+                    alert(data.message || '연차 취소에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('서버 연결에 실패했습니다.');
+            }
+        }
+
+        // 연차 신청 폼
+        document.getElementById('leaveForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const memberNo = localStorage.getItem('memberNo');
+
+            if (!memberNo) {
+                alert('로그인 정보가 없습니다. 다시 로그인해주세요.');
+                window.location.href = '/login';
+                return;
+            }
+
+            const formData = {
+                memberNo: memberNo,
+                leaveType: document.getElementById('leaveType').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                reason: document.getElementById('reason').value
+            };
+
+            try {
+                const response = await fetch('/api/leave', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('연차 신청이 완료되었습니다.');
+                    e.target.reset();
+                    // 페이지 새로고침하여 목록 갱신
+                    window.location.reload();
+                } else {
+                    alert(data.message || '연차 신청에 실패했습니다.');
+                }
+            } catch (error) {
+                alert('서버 연결에 실패했습니다.');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

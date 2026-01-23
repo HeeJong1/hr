@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.heejong.hr.mapper.NoticeMapper">
+
+    <!-- Result Map -->
+    <resultMap id="noticeResultMap" type="com.heejong.hr.entity.Notice">
+        <id property="noticeNo" column="notice_no"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="authorMemberNo" column="author_member_no"/>
+        <result property="isImportant" column="is_important"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="authorName" column="author_name"/>
+        <result property="authorId" column="author_id"/>
+    </resultMap>
+
+    <!-- 공지사항 작성 -->
+    <insert id="insertNotice" parameterType="com.heejong.hr.entity.Notice">
+        INSERT INTO notice (
+            title, content, author_member_no, is_important
+        ) VALUES (
+            #{title}, #{content}, #{authorMemberNo}, #{isImportant}
+        )
+    </insert>
+
+    <!-- 공지사항 수정 -->
+    <update id="updateNotice" parameterType="com.heejong.hr.entity.Notice">
+        UPDATE notice
+        SET 
+            title = #{title},
+            content = #{content},
+            is_important = #{isImportant},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE notice_no = #{noticeNo}
+    </update>
+
+    <!-- 공지사항 삭제 -->
+    <delete id="deleteNotice" parameterType="long">
+        DELETE FROM notice
+        WHERE notice_no = #{noticeNo}
+    </delete>
+
+    <!-- 공지사항 상세 조회 -->
+    <select id="findByNoticeNo" parameterType="long" resultMap="noticeResultMap">
+        SELECT 
+            n.notice_no,
+            n.title,
+            n.content,
+            n.author_member_no,
+            n.is_important,
+            n.view_count,
+            n.created_at,
+            n.updated_at,
+            m.name as author_name,
+            m.id as author_id
+        FROM notice n
+        INNER JOIN member m ON n.author_member_no = m.member_no
+        WHERE n.notice_no = #{noticeNo}
+    </select>
+
+    <!-- 모든 공지사항 조회 (중요 공지 우선, 최신순) -->
+    <select id="findAll" resultMap="noticeResultMap">
+        SELECT 
+            n.notice_no,
+            n.title,
+            n.content,
+            n.author_member_no,
+            n.is_important,
+            n.view_count,
+            n.created_at,
+            n.updated_at,
+            m.name as author_name,
+            m.id as author_id
+        FROM notice n
+        INNER JOIN member m ON n.author_member_no = m.member_no
+        ORDER BY n.is_important DESC, n.created_at DESC
+    </select>
+
+    <!-- 조회수 증가 -->
+    <update id="incrementViewCount" parameterType="long">
+        UPDATE notice
+        SET view_count = view_count + 1
+        WHERE notice_no = #{noticeNo}
+    </update>
+
+    <!-- 공지사항 검색 -->
+    <select id="searchNotices" parameterType="string" resultMap="noticeResultMap">
+        SELECT 
+            n.notice_no,
+            n.title,
+            n.content,
+            n.author_member_no,
+            n.is_important,
+            n.view_count,
+            n.created_at,
+            n.updated_at,
+            m.name as author_name,
+            m.id as author_id
+        FROM notice n
+        INNER JOIN member m ON n.author_member_no = m.member_no
+        WHERE n.title LIKE CONCAT('%', #{keyword}, '%')
+           OR n.content LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY n.is_important DESC, n.created_at DESC
+    </select>
+
+    <!-- 페이징 처리된 공지사항 조회 -->
+    <select id="findAllWithPaging" resultMap="noticeResultMap">
+        SELECT 
+            n.notice_no,
+            n.title,
+            n.content,
+            n.author_member_no,
+            n.is_important,
+            n.view_count,
+            n.created_at,
+            n.updated_at,
+            m.name as author_name,
+            m.id as author_id
+        FROM notice n
+        INNER JOIN member m ON n.author_member_no = m.member_no
+        ORDER BY n.is_important DESC, n.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 공지사항 개수 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM notice
+    </select>
+
+    <!-- 검색 결과 개수 -->
+    <select id="countByKeyword" parameterType="string" resultType="int">
+        SELECT COUNT(*) 
+        FROM notice
+        WHERE title LIKE CONCAT('%', #{keyword}, '%')
+           OR content LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 페이징 처리된 검색 결과 -->
+    <select id="searchNoticesWithPaging" resultMap="noticeResultMap">
+        SELECT 
+            n.notice_no,
+            n.title,
+            n.content,
+            n.author_member_no,
+            n.is_important,
+            n.view_count,
+            n.created_at,
+            n.updated_at,
+            m.name as author_name,
+            m.id as author_id
+        FROM notice n
+        INNER JOIN member m ON n.author_member_no = m.member_no
+        WHERE n.title LIKE CONCAT('%', #{keyword}, '%')
+           OR n.content LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY n.is_important DESC, n.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+</mapper>

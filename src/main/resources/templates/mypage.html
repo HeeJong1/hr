@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <style>
+        .profileCard {
+            background-color: #f5f5f5;
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profileCard h3 {
+            color: #333;
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+        }
+
+        .profileInfo {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .infoRow {
+            display: flex;
+            align-items: center;
+            padding: clamp(0.75rem, 2vw, 1rem);
+            background-color: white;
+            border-radius: clamp(6px, 1vw, 8px);
+            border-left: 4px solid #3498db;
+        }
+
+        .infoLabel {
+            color: #7f8c8d;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-weight: 600;
+            min-width: clamp(80px, 20vw, 120px);
+        }
+
+        .infoValue {
+            color: #2c3e50;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+        }
+
+        .passwordChange {
+            margin-top: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        .formGroup {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .formGroup label {
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .formGroup input {
+            padding: clamp(0.75rem, 2vw, 1rem);
+            border: 2px solid #ddd;
+            border-radius: clamp(4px, 1vw, 6px);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            background-color: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .formGroup input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btnChangePassword {
+            padding: clamp(0.875rem, 2vw, 1rem);
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: clamp(6px, 1vw, 8px);
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btnChangePassword:hover {
+            background-color: #2980b9;
+        }
+
+        .message {
+            padding: clamp(0.75rem, 2vw, 1rem);
+            border-radius: clamp(6px, 1vw, 8px);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            display: none;
+        }
+
+        .message.error {
+            background-color: #ffe6e6;
+            color: #d32f2f;
+            border: 1px solid #ffcccc;
+        }
+
+        .message.success {
+            background-color: #e6f7e6;
+            color: #2e7d32;
+            border: 1px solid #ccf0cc;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="layoutSection">
+        <!-- 모바일 메뉴 토글 -->
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <h2>HR 시스템</h2>
+            </div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem">💰 급여관리</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="mainContent">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1>마이페이지</h1>
+                <div class="userInfo">
+                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <span id="userName">사용자</span>
+                    </a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+
+            <!-- 컨텐츠 -->
+            <main class="content">
+                <!-- 연차 현황 -->
+                <div class="profileCard">
+                    <h3>내 연차 현황</h3>
+                    <div class="profileInfo"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <div class="infoRow" style="flex-direction: column; align-items: flex-start;">
+                            <span class="infoLabel">총 연차</span>
+                            <span class="infoValue" id="totalDays"
+                                style="font-size: clamp(1.3rem, 3vw, 1.5rem); color: #3498db;">-</span>
+                        </div>
+                        <div class="infoRow" style="flex-direction: column; align-items: flex-start;">
+                            <span class="infoLabel">사용한 연차</span>
+                            <span class="infoValue" id="usedDays"
+                                style="font-size: clamp(1.3rem, 3vw, 1.5rem); color: #e74c3c;">-</span>
+                        </div>
+                        <div class="infoRow" style="flex-direction: column; align-items: flex-start;">
+                            <span class="infoLabel">남은 연차</span>
+                            <span class="infoValue" id="remainingDays"
+                                style="font-size: clamp(1.3rem, 3vw, 1.5rem); color: #27ae60;">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 프로필 정보 -->
+                <div class="profileCard">
+                    <h3>내 정보</h3>
+                    <div class="profileInfo">
+                        <div class="infoRow">
+                            <span class="infoLabel">아이디</span>
+                            <span class="infoValue" id="userId">-</span>
+                        </div>
+                        <div class="infoRow">
+                            <span class="infoLabel">이름</span>
+                            <span class="infoValue" id="userNameInfo">-</span>
+                        </div>
+                        <div class="infoRow">
+                            <span class="infoLabel">이메일</span>
+                            <span class="infoValue" id="userEmail">-</span>
+                        </div>
+                        <div class="infoRow">
+                            <span class="infoLabel">직급</span>
+                            <span class="infoValue" id="userRole">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 비밀번호 변경 -->
+                <div class="profileCard">
+                    <h3>비밀번호 변경</h3>
+                    <div id="message" class="message"></div>
+                    <form id="passwordChangeForm" class="passwordChange">
+                        <div class="formGroup">
+                            <label for="currentPassword">현재 비밀번호</label>
+                            <input type="password" id="currentPassword" required placeholder="현재 비밀번호를 입력하세요">
+                        </div>
+                        <div class="formGroup">
+                            <label for="newPassword">새 비밀번호</label>
+                            <input type="password" id="newPassword" required placeholder="새 비밀번호를 입력하세요">
+                        </div>
+                        <div class="formGroup">
+                            <label for="confirmPassword">새 비밀번호 확인</label>
+                            <input type="password" id="confirmPassword" required placeholder="새 비밀번호를 다시 입력하세요">
+                        </div>
+                        <button type="submit" class="btnChangePassword">비밀번호 변경</button>
+                    </form>
+                </div>
+            </main>
+
+            <!-- 푸터 -->
+            <footer class="footer">
+                <div class="footerContent">
+                    <div>
+                        <strong>HR Management System</strong>
+                        <p>인사관리 시스템</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    © 2024 HR Management System. All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <script>
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('memberNo');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                alert('로그아웃되었습니다.');
+                window.location.href = '/login';
+            }
+        }
+
+        // 메시지 표시
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // 페이지 로드 시 사용자 정보 로드
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login';
+                return;
+            }
+
+            // localStorage에서 사용자 정보 가져오기
+            const userId = localStorage.getItem('userId') || '-';
+            const userEmail = localStorage.getItem('userEmail') || '-';
+            const userName = localStorage.getItem('userName') || '사용자';
+            const userRole = localStorage.getItem('userRole') || 'ROLE_USER';
+            const memberNo = localStorage.getItem('memberNo');
+
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userNameInfo').textContent = userName;
+            document.getElementById('userId').textContent = userId;
+            document.getElementById('userEmail').textContent = userEmail;
+
+            // 직급 표시
+            let roleText = 'USER';
+            if (userRole === 'ROLE_BOSS') {
+                roleText = 'BOSS';
+                // BOSS일 경우 관리자 메뉴 표시
+                document.querySelectorAll('.bossOnly').forEach(item => {
+                    item.classList.add('show');
+                });
+            }
+            document.getElementById('userRole').textContent = roleText;
+
+            // 연차 정보 로드
+            if (memberNo) {
+                await loadLeaveInfo(memberNo);
+            }
+        });
+
+        // 연차 정보 로드
+        async function loadLeaveInfo(memberNo) {
+            try {
+                const response = await fetch(`/api/leave/member/${memberNo}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('totalDays').textContent = data.totalDays + '일';
+                    document.getElementById('usedDays').textContent = data.usedDays + '일';
+                    document.getElementById('remainingDays').textContent = data.remainingDays + '일';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 비밀번호 변경 폼
+        document.getElementById('passwordChangeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // 비밀번호 확인
+            if (newPassword !== confirmPassword) {
+                showMessage('새 비밀번호가 일치하지 않습니다.', 'error');
+                return;
+            }
+
+            try {
+                // TODO: API 구현
+                showMessage('비밀번호 변경 기능은 준비 중입니다.', 'error');
+            } catch (error) {
+                showMessage('서버 연결에 실패했습니다.', 'error');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원탈퇴</title>
+    <link rel="stylesheet" href="/css/withdraw.css">
+</head>
+
+<body>
+    <section class="withdrawSection">
+        <div class="container">
+            <div class="withdrawBox">
+                <h1>회원탈퇴</h1>
+
+                <div class="warning">
+                    <h2>주의사항</h2>
+                    <p>회원 탈퇴 시 모든 개인정보가 삭제되며, 복구할 수 없습니다. 신중하게 결정해주세요.</p>
+                </div>
+
+                <div id="message" class="message"></div>
+
+                <form id="withdrawForm">
+                    <div class="formGroup">
+                        <label for="email">이메일</label>
+                        <input type="email" id="email" name="email" required placeholder="example@email.com">
+                    </div>
+                    <div class="formGroup">
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
+                    </div>
+
+                    <div class="buttonGroup">
+                        <button type="button" class="btnCancel" onclick="location.href='/login'">취소</button>
+                        <button type="submit" class="btnWithdraw">탈퇴하기</button>
+                    </div>
+                </form>
+
+                <div class="links">
+                    <a href="/login">로그인으로 돌아가기</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const form = document.getElementById('withdrawForm');
+        const messageDiv = document.getElementById('message');
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const confirmDelete = confirm('정말로 회원탈퇴를 진행하시겠습니까?\n이 작업은 되돌릴 수 없습니다.');
+
+            if (!confirmDelete) {
+                return;
+            }
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('회원탈퇴가 완료되었습니다.', 'success');
+                    localStorage.removeItem('token');
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    showMessage(data.message || '회원탈퇴에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                showMessage('서버 연결에 실패했습니다.', 'error');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

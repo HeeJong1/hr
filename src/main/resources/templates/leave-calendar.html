@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>휴가 캘린더</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    <style>
+        .calendarCard {
+            background-color: #f5f5f5;
+            border-radius: clamp(8px, 2vw, 12px);
+            padding: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendarCard h3 {
+            color: #333;
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+        }
+
+        #calendar {
+            background-color: white;
+            border-radius: clamp(6px, 1vw, 8px);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .fc-event {
+            cursor: pointer;
+        }
+
+        .fc-daygrid-event {
+            white-space: normal !important;
+        }
+
+        .legendCard {
+            background-color: white;
+            border-radius: clamp(6px, 1vw, 8px);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            margin-top: clamp(1rem, 3vw, 1.5rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .legendCard h4 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: clamp(0.95rem, 2vw, 1.05rem);
+        }
+
+        .legendItems {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .legendItem {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+        }
+
+        .legendColor {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-annual {
+            background-color: #3498db;
+        }
+
+        .legend-half {
+            background-color: #f39c12;
+        }
+
+        .legend-sick {
+            background-color: #e74c3c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modalContent {
+            background-color: white;
+            padding: clamp(1.5rem, 4vw, 2rem);
+            border-radius: clamp(8px, 2vw, 12px);
+            max-width: clamp(300px, 90vw, 500px);
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modalHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modalHeader h3 {
+            margin: 0;
+            color: #333;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+        }
+
+        .closeBtn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modalBody {
+            margin-bottom: 1.5rem;
+        }
+
+        .detailRow {
+            display: flex;
+            margin-bottom: 1rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .detailLabel {
+            font-weight: 600;
+            color: #555;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .detailValue {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .fc-toolbar {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .fc-toolbar-chunk {
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="layoutSection">
+        <!-- 모바일 메뉴 토글 -->
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <h2>HR 시스템</h2>
+            </div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem active">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem">💰 급여관리</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="mainContent">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1>휴가 캘린더</h1>
+                <div class="userInfo">
+                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <span id="userName">사용자</span>
+                    </a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+
+            <!-- 컨텐츠 -->
+            <main class="content">
+                <div class="calendarCard">
+                    <h3>전체 직원 휴가 일정</h3>
+                    <div id="calendar"></div>
+
+                    <!-- 범례 -->
+                    <div class="legendCard">
+                        <h4>연차 종류</h4>
+                        <div class="legendItems">
+                            <div class="legendItem">
+                                <div class="legendColor legend-annual"></div>
+                                <span>연차</span>
+                            </div>
+                            <div class="legendItem">
+                                <div class="legendColor legend-half"></div>
+                                <span>반차</span>
+                            </div>
+                            <div class="legendItem">
+                                <div class="legendColor legend-sick"></div>
+                                <span>병가</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 푸터 -->
+            <footer class="footer">
+                <div class="footerContent">
+                    <div>
+                        <strong>HR Management System</strong>
+                        <p>인사관리 시스템</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    © 2026 HR Management System. All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <!-- 상세 정보 모달 -->
+    <div id="detailModal" class="modal">
+        <div class="modalContent">
+            <div class="modalHeader">
+                <h3>휴가 상세 정보</h3>
+                <button class="closeBtn" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modalBody" id="modalBody">
+                <!-- 상세 정보가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let calendar;
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('memberNo');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                alert('로그아웃되었습니다.');
+                window.location.href = '/login';
+            }
+        }
+
+        // 페이지 로드 시
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login';
+                return;
+            }
+
+            const userName = localStorage.getItem('userName') || '사용자';
+            document.getElementById('userName').textContent = userName;
+
+            // BOSS 메뉴 표시
+            const userRole = localStorage.getItem('userRole');
+            if (userRole === 'ROLE_BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => {
+                    item.style.display = 'flex';
+                });
+            }
+
+            // 캘린더 초기화
+            initCalendar();
+        });
+
+        // 캘린더 초기화
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendar');
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ko',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,dayGridWeek'
+                },
+                buttonText: {
+                    today: '오늘',
+                    month: '월',
+                    week: '주'
+                },
+                events: function (info, successCallback, failureCallback) {
+                    loadLeaveEvents(info.start, info.end, successCallback, failureCallback);
+                },
+                eventClick: function (info) {
+                    showEventDetail(info.event.extendedProps);
+                },
+                eventDisplay: 'block',
+                displayEventTime: false,
+                height: 'auto'
+            });
+
+            calendar.render();
+        }
+
+        // 연차 데이터 로드
+        async function loadLeaveEvents(start, end, successCallback, failureCallback) {
+            try {
+                // 월 정보 추출 (YYYY-MM 형식)
+                const yearMonth = start.toISOString().substring(0, 7);
+
+                const response = await fetch(`/api/leave/calendar?yearMonth=${yearMonth}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const events = data.leaveRequests.map(leave => {
+                        let color = '#3498db'; // 기본: 연차 (파란색)
+                        if (leave.leaveType === 'half') color = '#f39c12'; // 반차 (주황색)
+                        if (leave.leaveType === 'sick') color = '#e74c3c'; // 병가 (빨간색)
+
+                        const leaveTypeText = leave.leaveType === 'annual' ? '연차' :
+                            leave.leaveType === 'half' ? '반차' : '병가';
+
+                        return {
+                            title: `${leave.memberName} (${leaveTypeText})`,
+                            start: leave.startDate,
+                            end: addDays(leave.endDate, 1), // FullCalendar는 종료일을 포함하지 않음
+                            backgroundColor: color,
+                            borderColor: color,
+                            extendedProps: leave
+                        };
+                    });
+
+                    successCallback(events);
+                } else {
+                    failureCallback(new Error('데이터 로드 실패'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                failureCallback(error);
+            }
+        }
+
+        // 날짜에 일수 추가
+        function addDays(dateString, days) {
+            const date = new Date(dateString);
+            date.setDate(date.getDate() + days);
+            return date.toISOString().split('T')[0];
+        }
+
+        // 이벤트 상세 정보 표시
+        function showEventDetail(leave) {
+            const leaveTypeText = leave.leaveType === 'annual' ? '연차' :
+                leave.leaveType === 'half' ? '반차' : '병가';
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detailRow">
+                    <div class="detailLabel">신청자:</div>
+                    <div class="detailValue">${leave.memberName} (${leave.memberId})</div>
+                </div>
+                <div class="detailRow">
+                    <div class="detailLabel">연차 종류:</div>
+                    <div class="detailValue">${leaveTypeText}</div>
+                </div>
+                <div class="detailRow">
+                    <div class="detailLabel">기간:</div>
+                    <div class="detailValue">${leave.startDate} ~ ${leave.endDate}</div>
+                </div>
+                <div class="detailRow">
+                    <div class="detailLabel">일수:</div>
+                    <div class="detailValue">${leave.days}일</div>
+                </div>
+                <div class="detailRow">
+                    <div class="detailLabel">사유:</div>
+                    <div class="detailValue">${leave.reason || '-'}</div>
+                </div>
+                <div class="detailRow">
+                    <div class="detailLabel">신청일:</div>
+                    <div class="detailValue">${new Date(leave.requestDate).toLocaleString('ko-KR')}</div>
+                </div>
+                ${leave.approvedDate ? `
+                <div class="detailRow">
+                    <div class="detailLabel">승인일:</div>
+                    <div class="detailValue">${new Date(leave.approvedDate).toLocaleString('ko-KR')}</div>
+                </div>
+                ` : ''}
+                ${leave.approverComment ? `
+                <div class="detailRow">
+                    <div class="detailLabel">승인자 코멘트:</div>
+                    <div class="detailValue">${leave.approverComment}</div>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        // 모달 닫기
+        function closeDetailModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function (event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeDetailModal();
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+
+<body>
+    <section class="loginSection">
+        <div class="container">
+            <div class="loginBox">
+                <h1>로그인</h1>
+                <div id="message" class="message"></div>
+                <form id="loginForm">
+                    <div class="formGroup">
+                        <label for="id">아이디</label>
+                        <input type="text" id="id" name="id" required placeholder="아이디를 입력하세요">
+                    </div>
+                    <div class="formGroup">
+                        <label for="password">비밀번호</label>
+                        <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
+                    </div>
+                    <div class="formGroup checkboxGroup">
+                        <label>
+                            <input type="checkbox" id="rememberMe">
+                            <span>아이디 저장</span>
+                        </label>
+                    </div>
+                    <button type="submit">로그인</button>
+                </form>
+
+                <div class="links">
+                    <a href="/withdraw">회원탈퇴</a>
+                    <a href="/signup">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+        const idInput = document.getElementById('id');
+        const rememberMeCheckbox = document.getElementById('rememberMe');
+
+        // 페이지 로드 시 저장된 아이디 불러오기
+        window.onload = function () {
+            const savedId = localStorage.getItem('savedUserId');
+            if (savedId) {
+                idInput.value = savedId;
+                rememberMeCheckbox.checked = true;
+            }
+        };
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = idInput.value;
+            const password = document.getElementById('password').value;
+            const rememberMe = rememberMeCheckbox.checked;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // 아이디 저장 처리
+                    if (rememberMe) {
+                        localStorage.setItem('savedUserId', id);
+                    } else {
+                        localStorage.removeItem('savedUserId');
+                    }
+
+                    // 로그인 정보 저장
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('memberNo', data.memberNo);
+                    localStorage.setItem('userId', data.id);
+                    localStorage.setItem('userEmail', data.email);
+                    localStorage.setItem('userName', data.name);
+                    localStorage.setItem('userRole', data.role);
+                    showMessage('로그인 성공! 메인 페이지로 이동합니다.', 'success');
+                    setTimeout(() => {
+                        // 로그인 후 연차관리 페이지로 리다이렉트
+                        window.location.href = '/leave';
+                    }, 1500);
+                } else {
+                    showMessage(data.message || '로그인에 실패했습니다.', 'error');
+                }
+            } catch (error) {
+                showMessage('서버 연결에 실패했습니다.', 'error');
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>

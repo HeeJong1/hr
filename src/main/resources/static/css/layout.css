@@ -1,0 +1,239 @@
+/* 레이아웃 공통 스타일 */
+.layoutSection * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.layoutSection {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 사이드바 */
+.layoutSection .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: clamp(200px, 20vw, 250px);
+    height: 100vh;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.layoutSection .sidebarHeader {
+    padding: clamp(1.5rem, 3vw, 2rem);
+    background-color: #34495e;
+    border-bottom: 1px solid #455a64;
+}
+
+.layoutSection .sidebarHeader h2 {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    color: white;
+}
+
+.layoutSection .sidebarMenu {
+    flex: 1;
+    padding: clamp(1rem, 2vw, 1.5rem) 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.layoutSection .menuItem {
+    padding: clamp(0.875rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.layoutSection .menuItem:hover {
+    background-color: #34495e;
+    border-left: 4px solid #3498db;
+}
+
+.layoutSection .menuItem.active {
+    background-color: #34495e;
+    border-left: 4px solid #3498db;
+    font-weight: 600;
+}
+
+.menuItem.bossOnly {
+    display: none;
+}
+
+.menuItem.bossOnly.show {
+    display: flex;
+}
+
+/* 메인 컨텐츠 */
+.layoutSection .mainContent {
+    margin-left: clamp(200px, 20vw, 250px);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.layoutSection .header {
+    background-color: #f5f5f5;
+    padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.layoutSection .header h1 {
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    color: #333;
+}
+
+.layoutSection .userInfo {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    flex-wrap: wrap;
+}
+
+.layoutSection .userName {
+    color: #555;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.layoutSection .btnLogout {
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: clamp(4px, 1vw, 6px);
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.layoutSection .btnLogout:hover {
+    background-color: #333;
+}
+
+/* 컨텐츠 영역 */
+.layoutSection .content {
+    flex: 1;
+    padding: clamp(1.5rem, 4vw, 2rem);
+    padding-bottom: clamp(3rem, 6vw, 4rem);
+}
+
+/* 푸터 */
+.layoutSection .footer {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    margin-left: 0;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.layoutSection .footerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.layoutSection .footerLinks {
+    display: flex;
+    gap: clamp(1rem, 3vw, 2rem);
+    flex-wrap: wrap;
+}
+
+.layoutSection .footerLinks a {
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.layoutSection .footerLinks a:hover {
+    color: #3498db;
+}
+
+.layoutSection .copyright {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #455a64;
+    color: #95a5a6;
+}
+
+/* 모바일 메뉴 토글 버튼 */
+.layoutSection .menuToggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1100;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* 태블릿 & 모바일 반응형 */
+@media (max-width: 768px) {
+    .layoutSection .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .layoutSection .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .layoutSection .mainContent {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .layoutSection .footer {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .layoutSection .menuToggle {
+        display: block;
+    }
+
+    .layoutSection .header {
+        padding-left: 4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .layoutSection .footerContent {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .layoutSection .footerLinks {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

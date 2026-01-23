@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출퇴근 관리</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <style>
+        .attendanceSection .contentCard {
+            background: white;
+            border-radius: clamp(8px, 1vw, 12px);
+            padding: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .attendanceSection .todayCard {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
+        }
+
+        .attendanceSection .todayCard h2 {
+            margin: 0 0 clamp(0.5rem, 1vw, 1rem) 0;
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+        }
+
+        .attendanceSection .currentTime {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: bold;
+            margin: clamp(0.5rem, 1vw, 1rem) 0;
+        }
+
+        .attendanceSection .currentDate {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            opacity: 0.9;
+        }
+
+        .attendanceSection .attendanceButtons {
+            display: flex;
+            gap: clamp(0.8rem, 2vw, 1rem);
+            margin-top: clamp(1rem, 2vw, 1.5rem);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .attendanceSection .btnAttendance {
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(2rem, 4vw, 3rem);
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-weight: 600;
+            border: none;
+            border-radius: clamp(6px, 1vw, 8px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .attendanceSection .btnCheckIn {
+            background: white;
+            color: #667eea;
+        }
+
+        .attendanceSection .btnCheckIn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .attendanceSection .btnCheckOut {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .attendanceSection .btnCheckOut:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .attendanceSection .statusBadge {
+            display: inline-block;
+            padding: clamp(0.3rem, 1vw, 0.4rem) clamp(0.6rem, 2vw, 0.8rem);
+            border-radius: clamp(4px, 1vw, 6px);
+            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+            font-weight: 600;
+        }
+
+        .attendanceSection .statusNormal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .attendanceSection .statusLate {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .attendanceSection .statusEarlyLeave {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .attendanceSection .statusAbsent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .attendanceSection .statsGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: clamp(0.8rem, 2vw, 1rem);
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .attendanceSection .statCard {
+            background: white;
+            border-radius: clamp(6px, 1vw, 8px);
+            padding: clamp(1rem, 2vw, 1.2rem);
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .attendanceSection .statCard h3 {
+            margin: 0 0 clamp(0.3rem, 1vw, 0.5rem) 0;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+            color: #666;
+        }
+
+        .attendanceSection .statCard .statValue {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: bold;
+            color: #333;
+        }
+
+        .attendanceSection .attendanceTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: clamp(0.8rem, 2vw, 1rem);
+        }
+
+        .attendanceSection .attendanceTable th,
+        .attendanceSection .attendanceTable td {
+            padding: clamp(0.6rem, 2vw, 0.8rem);
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+        }
+
+        .attendanceSection .attendanceTable th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .attendanceSection .attendanceTable tr:hover {
+            background: #f8f9fa;
+        }
+
+        .attendanceSection .noData {
+            text-align: center;
+            padding: clamp(2rem, 4vw, 3rem);
+            color: #999;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        @media (max-width: 768px) {
+            .attendanceSection .attendanceTable {
+                font-size: clamp(0.75rem, 2vw, 0.85rem);
+            }
+
+            .attendanceSection .attendanceTable th,
+            .attendanceSection .attendanceTable td {
+                padding: clamp(0.5rem, 1.5vw, 0.6rem);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section class="layoutSection">
+        <!-- 모바일 메뉴 토글 -->
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <h2>HR 시스템</h2>
+            </div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem active">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem">💰 급여관리</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="mainContent">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1>출퇴근 관리</h1>
+                <div class="userInfo">
+                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <span id="userName">사용자</span>
+                    </a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+
+            <!-- 출퇴근 섹션 -->
+            <section class="attendanceSection">
+                <!-- 오늘의 출퇴근 카드 -->
+                <div class="contentCard todayCard">
+                    <h2>오늘의 출퇴근</h2>
+                    <div class="currentDate" id="currentDate">2024년 1월 20일 화요일</div>
+                    <div class="currentTime" id="currentTime">00:00:00</div>
+
+                    <div id="todayStatus" style="margin-top: 1rem; font-size: clamp(1rem, 2vw, 1.2rem);">
+                        <!-- 동적으로 채워질 내용 -->
+                    </div>
+
+                    <div class="attendanceButtons">
+                        <button class="btnAttendance btnCheckIn" onclick="checkIn()">🌅 출근하기</button>
+                        <button class="btnAttendance btnCheckOut" onclick="checkOut()">🌙 퇴근하기</button>
+                    </div>
+                </div>
+
+                <!-- 이번 달 통계 -->
+                <div class="contentCard">
+                    <h2 style="margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">이번 달 근무
+                        통계</h2>
+                    <div class="statsGrid">
+                        <div class="statCard">
+                            <h3>총 근무시간</h3>
+                            <div class="statValue" id="totalHours">0:00</div>
+                        </div>
+                        <div class="statCard">
+                            <h3>평균 근무시간</h3>
+                            <div class="statValue" id="avgHours">0:00</div>
+                        </div>
+                        <div class="statCard">
+                            <h3>지각</h3>
+                            <div class="statValue" id="lateCount">0회</div>
+                        </div>
+                        <div class="statCard">
+                            <h3>조퇴</h3>
+                            <div class="statValue" id="earlyLeaveCount">0회</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 최근 출퇴근 내역 -->
+                <div class="contentCard">
+                    <h2 style="margin: 0 0 clamp(0.5rem, 1vw, 1rem) 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">최근 출퇴근 내역
+                    </h2>
+                    <table class="attendanceTable">
+                        <thead>
+                            <tr>
+                                <th>날짜</th>
+                                <th>출근시간</th>
+                                <th>퇴근시간</th>
+                                <th>근무시간</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <tr>
+                                <td colspan="5" class="noData">출퇴근 기록을 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <p>&copy; 2024 HR System. All rights reserved.</p>
+        </footer>
+    </section>
+
+    <script>
+        let memberNo = null;
+        let userName = null;
+        let userRole = null;
+
+        // 페이지 로드 시 실행
+        window.onload = async function () {
+            // 로그인 확인
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login';
+                return;
+            }
+
+            memberNo = localStorage.getItem('memberNo');
+            userName = localStorage.getItem('userName') || '사용자';
+            userRole = localStorage.getItem('userRole');
+
+            document.getElementById('userName').textContent = userName;
+
+            // BOSS 메뉴 표시
+            if (userRole === 'ROLE_BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => {
+                    item.classList.add('show');
+                });
+            }
+
+            // 현재 시간 업데이트
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+
+            // 오늘의 출퇴근 기록 조회
+            await loadTodayAttendance();
+
+            // 최근 출퇴근 내역 조회
+            await loadAttendanceList();
+
+            // 이번 달 통계 조회
+            await loadMonthlyStats();
+        };
+
+        // 현재 시간 업데이트
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+
+            document.getElementById('currentTime').textContent = timeStr;
+            document.getElementById('currentDate').textContent = dateStr;
+        }
+
+        // 오늘의 출퇴근 기록 조회
+        async function loadTodayAttendance() {
+            try {
+                const response = await fetch(`/api/attendance/today/${memberNo}`);
+                const data = await response.json();
+
+                const statusDiv = document.getElementById('todayStatus');
+
+                if (data.attendance) {
+                    const att = data.attendance;
+                    const checkInTime = new Date(att.checkInTime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+                    let statusHtml = `<div>출근: ${checkInTime}</div>`;
+
+                    if (att.checkOutTime) {
+                        const checkOutTime = new Date(att.checkOutTime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+                        statusHtml += `<div>퇴근: ${checkOutTime}</div>`;
+                        statusHtml += `<div>근무시간: ${att.workHours}</div>`;
+                    } else {
+                        statusHtml += `<div style="margin-top: 0.5rem; opacity: 0.8;">근무 중...</div>`;
+                    }
+
+                    statusDiv.innerHTML = statusHtml;
+                } else {
+                    statusDiv.innerHTML = '<div style="opacity: 0.8;">아직 출근하지 않았습니다</div>';
+                }
+            } catch (error) {
+                console.error('오늘의 출퇴근 기록 조회 실패:', error);
+            }
+        }
+
+        // 최근 출퇴근 내역 조회
+        async function loadAttendanceList() {
+            try {
+                const response = await fetch(`/api/attendance/member/${memberNo}?limit=30`);
+                const data = await response.json();
+
+                const tbody = document.getElementById('attendanceTableBody');
+
+                if (!data.attendanceList || data.attendanceList.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="noData">출퇴근 기록이 없습니다</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.attendanceList.map(att => {
+                    const workDate = new Date(att.workDate).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+                    const checkInTime = att.checkInTime ? new Date(att.checkInTime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const checkOutTime = att.checkOutTime ? new Date(att.checkOutTime).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '-';
+                    const workHours = att.workHours || '-';
+
+                    let statusBadge = '';
+                    let statusText = '';
+
+                    switch (att.status) {
+                        case 'NORMAL':
+                            statusBadge = 'statusNormal';
+                            statusText = '정상';
+                            break;
+                        case 'LATE':
+                            statusBadge = 'statusLate';
+                            statusText = '지각';
+                            break;
+                        case 'EARLY_LEAVE':
+                            statusBadge = 'statusEarlyLeave';
+                            statusText = '조퇴';
+                            break;
+                        case 'ABSENT':
+                            statusBadge = 'statusAbsent';
+                            statusText = '결근';
+                            break;
+                    }
+
+                    return `
+                        <tr>
+                            <td>${workDate}</td>
+                            <td>${checkInTime}</td>
+                            <td>${checkOutTime}</td>
+                            <td>${workHours}</td>
+                            <td><span class="statusBadge ${statusBadge}">${statusText}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('출퇴근 내역 조회 실패:', error);
+            }
+        }
+
+        // 이번 달 통계 조회
+        async function loadMonthlyStats() {
+            try {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth() + 1;
+
+                const response = await fetch(`/api/attendance/member/${memberNo}/monthly?year=${year}&month=${month}`);
+                const data = await response.json();
+
+                document.getElementById('totalHours').textContent = data.totalHours || '0:00';
+
+                if (data.attendanceList && data.attendanceList.length > 0) {
+                    const totalMinutes = data.totalMinutes || 0;
+                    const avgMinutes = Math.floor(totalMinutes / data.attendanceList.length);
+                    const avgHours = Math.floor(avgMinutes / 60);
+                    const avgMins = avgMinutes % 60;
+                    document.getElementById('avgHours').textContent = `${avgHours}:${avgMins.toString().padStart(2, '0')}`;
+
+                    const lateCount = data.attendanceList.filter(att => att.status === 'LATE').length;
+                    const earlyLeaveCount = data.attendanceList.filter(att => att.status === 'EARLY_LEAVE').length;
+
+                    document.getElementById('lateCount').textContent = `${lateCount}회`;
+                    document.getElementById('earlyLeaveCount').textContent = `${earlyLeaveCount}회`;
+                } else {
+                    document.getElementById('avgHours').textContent = '0:00';
+                    document.getElementById('lateCount').textContent = '0회';
+                    document.getElementById('earlyLeaveCount').textContent = '0회';
+                }
+            } catch (error) {
+                console.error('월별 통계 조회 실패:', error);
+            }
+        }
+
+        // 출근하기
+        async function checkIn() {
+            if (!confirm('출근 처리하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/attendance/check-in', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        memberNo: memberNo,
+                        memo: null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    await loadTodayAttendance();
+                    await loadAttendanceList();
+                    await loadMonthlyStats();
+                } else {
+                    alert(data.message || '출근 처리 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('출근 처리 실패:', error);
+                alert('출근 처리 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 퇴근하기
+        async function checkOut() {
+            if (!confirm('퇴근 처리하시겠습니까?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/attendance/check-out', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        memberNo: memberNo
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    await loadTodayAttendance();
+                    await loadAttendanceList();
+                    await loadMonthlyStats();
+                } else {
+                    alert(data.message || '퇴근 처리 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('퇴근 처리 실패:', error);
+                alert('퇴근 처리 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 모바일 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('memberNo');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+
+</html>

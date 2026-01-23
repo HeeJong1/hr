@@ -1,0 +1,210 @@
+.salarySection .contentCard {
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.salarySection .salaryInfoCard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.salarySection .salaryInfoCard h2 {
+    margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+}
+
+.salarySection .salaryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.salarySection .salaryItem {
+    background: rgba(255, 255, 255, 0.1);
+    padding: clamp(1rem, 2vw, 1.2rem);
+    border-radius: clamp(6px, 1vw, 8px);
+}
+
+.salarySection .salaryItem label {
+    display: block;
+    font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.salarySection .salaryItem .value {
+    font-size: clamp(1.3rem, 3vw, 1.6rem);
+    font-weight: bold;
+}
+
+.salarySection .paymentHistoryTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: clamp(0.8rem, 2vw, 1rem);
+}
+
+.salarySection .paymentHistoryTable th,
+.salarySection .paymentHistoryTable td {
+    padding: clamp(0.6rem, 2vw, 0.8rem);
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+}
+
+.salarySection .paymentHistoryTable th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #555;
+}
+
+.salarySection .paymentHistoryTable tr:hover {
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+.salarySection .statusBadge {
+    display: inline-block;
+    padding: clamp(0.3rem, 1vw, 0.4rem) clamp(0.6rem, 2vw, 0.8rem);
+    border-radius: clamp(4px, 1vw, 6px);
+    font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+    font-weight: 600;
+}
+
+.salarySection .statusPending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.salarySection .statusPaid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.salarySection .noData {
+    text-align: center;
+    padding: clamp(2rem, 4vw, 3rem);
+    color: #999;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.salarySection .btnPrimary {
+    padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1.5rem, 3vw, 2rem);
+    background-color: #667eea;
+    color: white;
+    border: none;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.salarySection .btnPrimary:hover {
+    background-color: #5568d3;
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+.modalContent {
+    background-color: white;
+    margin: 5% auto;
+    padding: clamp(1.5rem, 4vw, 2rem);
+    border-radius: clamp(8px, 2vw, 12px);
+    width: clamp(300px, 90%, 600px);
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+}
+
+.closeModal {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+.closeModal:hover {
+    color: #000;
+}
+
+.salaryDetailGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.salaryDetailItem {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.5rem;
+}
+
+.salaryDetailItem label {
+    display: block;
+    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+    color: #666;
+    margin-bottom: 0.3rem;
+}
+
+.salaryDetailItem .value {
+    font-size: clamp(1rem, 2vw, 1.1rem);
+    font-weight: 600;
+    color: #333;
+}
+
+.salaryTotal {
+    background: #f8f9fa;
+    padding: clamp(1rem, 2vw, 1.2rem);
+    border-radius: clamp(6px, 1vw, 8px);
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.salaryTotal .totalItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+}
+
+.salaryTotal .totalItem.final {
+    margin-top: clamp(0.8rem, 2vw, 1rem);
+    padding-top: clamp(0.8rem, 2vw, 1rem);
+    border-top: 2px solid #667eea;
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+    font-weight: bold;
+    color: #667eea;
+}
+
+@media (max-width: 768px) {
+    .salaryDetailGrid {
+        grid-template-columns: 1fr;
+    }
+}

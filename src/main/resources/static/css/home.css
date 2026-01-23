@@ -1,0 +1,171 @@
+.homeSection * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.homeSection {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    min-height: 100vh;
+    padding: clamp(1rem, 5vw, 2rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.homeSection .container {
+    max-width: clamp(600px, 90vw, 1200px);
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 4vw, 2rem);
+}
+
+.homeSection .header {
+    background-color: #f5f5f5;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    border-radius: clamp(12px, 2vw, 20px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(1rem, 3vw, 1.5rem);
+}
+
+.homeSection h1 {
+    color: #333;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+}
+
+.homeSection .userInfo {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    flex-wrap: wrap;
+}
+
+.homeSection .welcome {
+    color: #555;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+}
+
+.homeSection .content {
+    background-color: #f5f5f5;
+    padding: clamp(2rem, 5vw, 3rem);
+    border-radius: clamp(12px, 2vw, 20px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.homeSection .content h2 {
+    color: #333;
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+}
+
+.homeSection .content p {
+    color: #666;
+    line-height: 1.8;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    margin-bottom: 1rem;
+}
+
+.homeSection .buttonGroup {
+    display: flex;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    margin-top: clamp(1.5rem, 4vw, 2rem);
+    flex-wrap: wrap;
+}
+
+.homeSection button,
+.homeSection .btn {
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+    border: none;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.homeSection .btnPrimary {
+    background-color: #555;
+    color: white;
+}
+
+.homeSection .btnPrimary:hover {
+    background-color: #333;
+}
+
+.homeSection .btnDanger {
+    background-color: #d32f2f;
+    color: white;
+}
+
+.homeSection .btnDanger:hover {
+    background-color: #b71c1c;
+}
+
+.homeSection button:active,
+.homeSection .btn:active {
+    transform: scale(0.98);
+}
+
+.homeSection .infoBox {
+    background-color: #fff;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    border-radius: clamp(8px, 1vw, 12px);
+    margin-top: clamp(1rem, 3vw, 1.5rem);
+    border-left: 4px solid #555;
+}
+
+.homeSection .infoBox h3 {
+    color: #333;
+    font-size: clamp(1rem, 3vw, 1.2rem);
+    margin-bottom: 0.5rem;
+}
+
+.homeSection .infoBox p {
+    color: #666;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .homeSection .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .homeSection .userInfo {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .homeSection .buttonGroup {
+        width: 100%;
+    }
+
+    .homeSection button,
+    .homeSection .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .homeSection .buttonGroup {
+        flex-direction: column;
+    }
+
+    .homeSection button,
+    .homeSection .btn {
+        width: 100%;
+    }
+}

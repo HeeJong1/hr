@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.heejong.hr.mapper.SalaryMapper">
+
+    <!-- 급여 정보 ResultMap -->
+    <resultMap id="salaryResultMap" type="com.heejong.hr.entity.Salary">
+        <id property="salaryNo" column="salary_no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="baseSalary" column="base_salary"/>
+        <result property="positionAllowance" column="position_allowance"/>
+        <result property="mealAllowance" column="meal_allowance"/>
+        <result property="transportAllowance" column="transport_allowance"/>
+        <result property="accountBank" column="account_bank"/>
+        <result property="accountNumber" column="account_number"/>
+        <result property="effectiveDate" column="effective_date"/>
+        <result property="status" column="status"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberName" column="member_name"/>
+    </resultMap>
+
+    <!-- 급여 지급 ResultMap -->
+    <resultMap id="salaryPaymentResultMap" type="com.heejong.hr.entity.SalaryPayment">
+        <id property="salaryPaymentNo" column="salary_payment_no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="paymentYear" column="payment_year"/>
+        <result property="paymentMonth" column="payment_month"/>
+        <result property="baseSalary" column="base_salary"/>
+        <result property="positionAllowance" column="position_allowance"/>
+        <result property="mealAllowance" column="meal_allowance"/>
+        <result property="transportAllowance" column="transport_allowance"/>
+        <result property="overtimePay" column="overtime_pay"/>
+        <result property="bonus" column="bonus"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="incomeTax" column="income_tax"/>
+        <result property="nationalPension" column="national_pension"/>
+        <result property="healthInsurance" column="health_insurance"/>
+        <result property="employmentInsurance" column="employment_insurance"/>
+        <result property="totalDeduction" column="total_deduction"/>
+        <result property="netAmount" column="net_amount"/>
+        <result property="paymentDate" column="payment_date"/>
+        <result property="status" column="status"/>
+        <result property="workDays" column="work_days"/>
+        <result property="workHours" column="work_hours"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberName" column="member_name"/>
+    </resultMap>
+
+    <!-- ========== 급여 정보 관리 ========== -->
+
+    <!-- 급여 정보 등록 -->
+    <insert id="insertSalary" parameterType="com.heejong.hr.entity.Salary">
+        INSERT INTO salary (member_no, base_salary, position_allowance, meal_allowance, 
+                           transport_allowance, account_bank, account_number, effective_date, status)
+        VALUES (#{memberNo}, #{baseSalary}, #{positionAllowance}, #{mealAllowance}, 
+                #{transportAllowance}, #{accountBank}, #{accountNumber}, #{effectiveDate}, #{status})
+    </insert>
+
+    <!-- 급여 정보 수정 -->
+    <update id="updateSalary" parameterType="com.heejong.hr.entity.Salary">
+        UPDATE salary
+        SET base_salary = #{baseSalary},
+            position_allowance = #{positionAllowance},
+            meal_allowance = #{mealAllowance},
+            transport_allowance = #{transportAllowance},
+            account_bank = #{accountBank},
+            account_number = #{accountNumber},
+            effective_date = #{effectiveDate},
+            status = #{status}
+        WHERE salary_no = #{salaryNo}
+    </update>
+
+    <!-- 특정 회원의 급여 정보 조회 -->
+    <select id="findByMemberNo" resultMap="salaryResultMap">
+        SELECT s.salary_no, s.member_no, s.base_salary, s.position_allowance, 
+               s.meal_allowance, s.transport_allowance, s.account_bank, s.account_number,
+               s.effective_date, s.status,
+               m.id as member_id, m.name as member_name
+        FROM salary s
+        LEFT JOIN member m ON s.member_no = m.member_no
+        WHERE s.member_no = #{memberNo}
+        AND s.status = 'ACTIVE'
+    </select>
+
+    <!-- 모든 급여 정보 조회 -->
+    <select id="findAllSalaries" resultMap="salaryResultMap">
+        SELECT s.salary_no, s.member_no, s.base_salary, s.position_allowance, 
+               s.meal_allowance, s.transport_allowance, s.account_bank, s.account_number,
+               s.effective_date, s.status,
+               m.id as member_id, m.name as member_name
+        FROM salary s
+        LEFT JOIN member m ON s.member_no = m.member_no
+        ORDER BY m.name ASC
+    </select>
+
+    <!-- 급여 정보 삭제 -->
+    <delete id="deleteSalary">
+        DELETE FROM salary WHERE salary_no = #{salaryNo}
+    </delete>
+
+    <!-- ========== 급여 지급 관리 ========== -->
+
+    <!-- 급여 지급 등록 -->
+    <insert id="insertSalaryPayment" parameterType="com.heejong.hr.entity.SalaryPayment">
+        INSERT INTO salary_payment (member_no, payment_year, payment_month, base_salary, 
+                                    position_allowance, meal_allowance, transport_allowance, 
+                                    overtime_pay, bonus, total_amount, income_tax, national_pension, 
+                                    health_insurance, employment_insurance, total_deduction, 
+                                    net_amount, payment_date, status, work_days, work_hours)
+        VALUES (#{memberNo}, #{paymentYear}, #{paymentMonth}, #{baseSalary}, 
+                #{positionAllowance}, #{mealAllowance}, #{transportAllowance}, 
+                #{overtimePay}, #{bonus}, #{totalAmount}, #{incomeTax}, #{nationalPension}, 
+                #{healthInsurance}, #{employmentInsurance}, #{totalDeduction}, 
+                #{netAmount}, #{paymentDate}, #{status}, #{workDays}, #{workHours})
+    </insert>
+
+    <!-- 급여 지급 수정 -->
+    <update id="updateSalaryPayment" parameterType="com.heejong.hr.entity.SalaryPayment">
+        UPDATE salary_payment
+        SET base_salary = #{baseSalary},
+            position_allowance = #{positionAllowance},
+            meal_allowance = #{mealAllowance},
+            transport_allowance = #{transportAllowance},
+            overtime_pay = #{overtimePay},
+            bonus = #{bonus},
+            total_amount = #{totalAmount},
+            income_tax = #{incomeTax},
+            national_pension = #{nationalPension},
+            health_insurance = #{healthInsurance},
+            employment_insurance = #{employmentInsurance},
+            total_deduction = #{totalDeduction},
+            net_amount = #{netAmount},
+            payment_date = #{paymentDate},
+            status = #{status},
+            work_days = #{workDays},
+            work_hours = #{workHours}
+        WHERE salary_payment_no = #{salaryPaymentNo}
+    </update>
+
+    <!-- 급여 지급 상태 변경 -->
+    <update id="updatePaymentStatus">
+        UPDATE salary_payment
+        SET status = #{status}
+        WHERE salary_payment_no = #{salaryPaymentNo}
+    </update>
+
+    <!-- 특정 급여 지급 내역 조회 -->
+    <select id="findPaymentById" resultMap="salaryPaymentResultMap">
+        SELECT sp.salary_payment_no, sp.member_no, sp.payment_year, sp.payment_month,
+               sp.base_salary, sp.position_allowance, sp.meal_allowance, sp.transport_allowance,
+               sp.overtime_pay, sp.bonus, sp.total_amount, sp.income_tax, sp.national_pension,
+               sp.health_insurance, sp.employment_insurance, sp.total_deduction, sp.net_amount,
+               sp.payment_date, sp.status, sp.work_days, sp.work_hours,
+               m.id as member_id, m.name as member_name
+        FROM salary_payment sp
+        LEFT JOIN member m ON sp.member_no = m.member_no
+        WHERE sp.salary_payment_no = #{salaryPaymentNo}
+    </select>
+
+    <!-- 특정 회원의 급여 지급 내역 조회 -->
+    <select id="findPaymentsByMemberNo" resultMap="salaryPaymentResultMap">
+        SELECT sp.salary_payment_no, sp.member_no, sp.payment_year, sp.payment_month,
+               sp.base_salary, sp.position_allowance, sp.meal_allowance, sp.transport_allowance,
+               sp.overtime_pay, sp.bonus, sp.total_amount, sp.income_tax, sp.national_pension,
+               sp.health_insurance, sp.employment_insurance, sp.total_deduction, sp.net_amount,
+               sp.payment_date, sp.status, sp.work_days, sp.work_hours,
+               m.id as member_id, m.name as member_name
+        FROM salary_payment sp
+        LEFT JOIN member m ON sp.member_no = m.member_no
+        WHERE sp.member_no = #{memberNo}
+        ORDER BY sp.payment_year DESC, sp.payment_month DESC
+    </select>
+
+    <!-- 특정 회원의 특정 월 급여 지급 내역 조회 -->
+    <select id="findPaymentByMemberAndMonth" resultMap="salaryPaymentResultMap">
+        SELECT sp.salary_payment_no, sp.member_no, sp.payment_year, sp.payment_month,
+               sp.base_salary, sp.position_allowance, sp.meal_allowance, sp.transport_allowance,
+               sp.overtime_pay, sp.bonus, sp.total_amount, sp.income_tax, sp.national_pension,
+               sp.health_insurance, sp.employment_insurance, sp.total_deduction, sp.net_amount,
+               sp.payment_date, sp.status, sp.work_days, sp.work_hours,
+               m.id as member_id, m.name as member_name
+        FROM salary_payment sp
+        LEFT JOIN member m ON sp.member_no = m.member_no
+        WHERE sp.member_no = #{memberNo}
+        AND sp.payment_year = #{year}
+        AND sp.payment_month = #{month}
+    </select>
+
+    <!-- 모든 급여 지급 내역 조회 -->
+    <select id="findAllPayments" resultMap="salaryPaymentResultMap">
+        SELECT sp.salary_payment_no, sp.member_no, sp.payment_year, sp.payment_month,
+               sp.base_salary, sp.position_allowance, sp.meal_allowance, sp.transport_allowance,
+               sp.overtime_pay, sp.bonus, sp.total_amount, sp.income_tax, sp.national_pension,
+               sp.health_insurance, sp.employment_insurance, sp.total_deduction, sp.net_amount,
+               sp.payment_date, sp.status, sp.work_days, sp.work_hours,
+               m.id as member_id, m.name as member_name
+        FROM salary_payment sp
+        LEFT JOIN member m ON sp.member_no = m.member_no
+        <where>
+            <if test="year != null">
+                AND sp.payment_year = #{year}
+            </if>
+            <if test="month != null">
+                AND sp.payment_month = #{month}
+            </if>
+        </where>
+        ORDER BY sp.payment_year DESC, sp.payment_month DESC, m.name ASC
+    </select>
+
+    <!-- 급여 지급 내역 삭제 -->
+    <delete id="deletePayment">
+        DELETE FROM salary_payment WHERE salary_payment_no = #{salaryPaymentNo}
+    </delete>
+
+</mapper>

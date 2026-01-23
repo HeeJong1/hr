@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>급여 관리</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/salary.css">
+</head>
+
+<body>
+    <section class="layoutSection">
+        <!-- 모바일 메뉴 토글 -->
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <h2>HR 시스템</h2>
+            </div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem active">💰 급여관리</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="mainContent">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1>급여 관리</h1>
+                <div class="userInfo">
+                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <span id="userName">사용자</span>
+                    </a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+
+            <!-- 급여 섹션 -->
+            <section class="salarySection">
+                <!-- 현재 급여 정보 -->
+                <div class="contentCard salaryInfoCard" id="salaryInfoCard" style="display: none;">
+                    <h2>내 급여 정보</h2>
+                    <div class="salaryGrid">
+                        <div class="salaryItem">
+                            <label>기본급</label>
+                            <div class="value" id="baseSalary">0원</div>
+                        </div>
+                        <div class="salaryItem">
+                            <label>직책수당</label>
+                            <div class="value" id="positionAllowance">0원</div>
+                        </div>
+                        <div class="salaryItem">
+                            <label>식대</label>
+                            <div class="value" id="mealAllowance">0원</div>
+                        </div>
+                        <div class="salaryItem">
+                            <label>교통비</label>
+                            <div class="value" id="transportAllowance">0원</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 급여 지급 내역 -->
+                <div class="contentCard">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: clamp(1rem, 2vw, 1.5rem);">
+                        <h2 style="margin: 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">급여 지급 내역</h2>
+                    </div>
+                    <table class="paymentHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>지급년월</th>
+                                <th>총 지급액</th>
+                                <th>공제액</th>
+                                <th>실 지급액</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentTableBody">
+                            <tr>
+                                <td colspan="5" class="noData">급여 지급 내역을 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <p>&copy; 2024 HR System. All rights reserved.</p>
+        </footer>
+    </section>
+
+    <!-- 급여 명세서 모달 -->
+    <div id="salaryDetailModal" class="modal">
+        <div class="modalContent">
+            <div class="modalHeader">
+                <h2>급여 명세서</h2>
+                <button class="closeModal" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div id="salaryDetailContent">
+                <!-- 동적으로 채워질 내용 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let memberNo = null;
+        let userName = null;
+        let userRole = null;
+
+        // 페이지 로드 시 실행
+        window.onload = async function () {
+            // 로그인 확인
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login';
+                return;
+            }
+
+            memberNo = localStorage.getItem('memberNo');
+            userName = localStorage.getItem('userName') || '사용자';
+            userRole = localStorage.getItem('userRole');
+
+            document.getElementById('userName').textContent = userName;
+
+            // BOSS 메뉴 표시
+            if (userRole === 'ROLE_BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => {
+                    item.classList.add('show');
+                });
+            }
+
+            // 급여 정보 및 내역 조회
+            await loadSalaryInfo();
+            await loadPaymentHistory();
+        };
+
+        // 급여 정보 조회
+        async function loadSalaryInfo() {
+            try {
+                const response = await fetch(`/api/salary/member/${memberNo}`);
+                const data = await response.json();
+
+                if (data.salary) {
+                    const salary = data.salary;
+                    document.getElementById('salaryInfoCard').style.display = 'block';
+                    document.getElementById('baseSalary').textContent = formatCurrency(salary.baseSalary);
+                    document.getElementById('positionAllowance').textContent = formatCurrency(salary.positionAllowance);
+                    document.getElementById('mealAllowance').textContent = formatCurrency(salary.mealAllowance);
+                    document.getElementById('transportAllowance').textContent = formatCurrency(salary.transportAllowance);
+                }
+            } catch (error) {
+                console.error('급여 정보 조회 실패:', error);
+            }
+        }
+
+        // 급여 지급 내역 조회
+        async function loadPaymentHistory() {
+            try {
+                const response = await fetch(`/api/salary/payment/member/${memberNo}`);
+                const data = await response.json();
+
+                const tbody = document.getElementById('paymentTableBody');
+
+                if (!data.payments || data.payments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="noData">급여 지급 내역이 없습니다</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.payments.map(payment => {
+                    const statusClass = payment.status === 'PAID' ? 'statusPaid' : 'statusPending';
+                    const statusText = payment.status === 'PAID' ? '지급완료' : '대기중';
+
+                    return `
+                        <tr onclick="showPaymentDetail(${payment.salaryPaymentNo})">
+                            <td>${payment.paymentYear}년 ${payment.paymentMonth}월</td>
+                            <td>${formatCurrency(payment.totalAmount)}</td>
+                            <td>${formatCurrency(payment.totalDeduction)}</td>
+                            <td><strong>${formatCurrency(payment.netAmount)}</strong></td>
+                            <td><span class="statusBadge ${statusClass}">${statusText}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('급여 지급 내역 조회 실패:', error);
+            }
+        }
+
+        // 급여 명세서 상세보기
+        async function showPaymentDetail(salaryPaymentNo) {
+            try {
+                const response = await fetch(`/api/salary/payment/${salaryPaymentNo}`);
+                const data = await response.json();
+
+                if (data.payment) {
+                    const p = data.payment;
+                    const content = `
+                        <div style="margin-bottom: 1rem;">
+                            <h3 style="color: #667eea; margin: 0 0 0.5rem 0;">${p.paymentYear}년 ${p.paymentMonth}월 급여 명세서</h3>
+                            <p style="color: #666; font-size: 0.9rem; margin: 0;">지급일: ${formatDate(p.paymentDate)}</p>
+                        </div>
+
+                        <div class="salaryDetailGrid">
+                            <div class="salaryDetailItem">
+                                <label>기본급</label>
+                                <div class="value">${formatCurrency(p.baseSalary)}</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>직책수당</label>
+                                <div class="value">${formatCurrency(p.positionAllowance)}</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>식대</label>
+                                <div class="value">${formatCurrency(p.mealAllowance)}</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>교통비</label>
+                                <div class="value">${formatCurrency(p.transportAllowance)}</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>초과근무수당</label>
+                                <div class="value">${formatCurrency(p.overtimePay)}</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>상여금</label>
+                                <div class="value">${formatCurrency(p.bonus)}</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>근무일수</label>
+                                <div class="value">${p.workDays || 0}일</div>
+                            </div>
+                            <div class="salaryDetailItem">
+                                <label>근무시간</label>
+                                <div class="value">${p.workHours || 0}시간</div>
+                            </div>
+                        </div>
+
+                        <div class="salaryTotal">
+                            <div class="totalItem">
+                                <span>총 지급액</span>
+                                <strong>${formatCurrency(p.totalAmount)}</strong>
+                            </div>
+                            <div class="totalItem">
+                                <span>소득세</span>
+                                <span style="color: #d32f2f;">-${formatCurrency(p.incomeTax)}</span>
+                            </div>
+                            <div class="totalItem">
+                                <span>국민연금</span>
+                                <span style="color: #d32f2f;">-${formatCurrency(p.nationalPension)}</span>
+                            </div>
+                            <div class="totalItem">
+                                <span>건강보험</span>
+                                <span style="color: #d32f2f;">-${formatCurrency(p.healthInsurance)}</span>
+                            </div>
+                            <div class="totalItem">
+                                <span>고용보험</span>
+                                <span style="color: #d32f2f;">-${formatCurrency(p.employmentInsurance)}</span>
+                            </div>
+                            <div class="totalItem final">
+                                <span>실 지급액</span>
+                                <span>${formatCurrency(p.netAmount)}</span>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('salaryDetailContent').innerHTML = content;
+                    document.getElementById('salaryDetailModal').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('급여 명세서 조회 실패:', error);
+                alert('급여 명세서 조회에 실패했습니다.');
+            }
+        }
+
+        // 모달 닫기
+        function closeDetailModal() {
+            document.getElementById('salaryDetailModal').style.display = 'none';
+        }
+
+        // 모달 외부 클릭시 닫기
+        window.onclick = function (event) {
+            const modal = document.getElementById('salaryDetailModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // 금액 포맷
+        function formatCurrency(amount) {
+            if (!amount) return '0원';
+            return new Intl.NumberFormat('ko-KR').format(amount) + '원';
+        }
+
+        // 날짜 포맷
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // 모바일 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('memberNo');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userRole');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+
+</html>
