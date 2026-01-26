@@ -2,7 +2,6 @@ package com.heejong.hr.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import lombok.Getter;
 import lombok.Setter;
