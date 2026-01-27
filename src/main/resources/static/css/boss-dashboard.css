@@ -1,0 +1,219 @@
+/* Boss 대시보드 스타일 */
+
+.dashboardStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+}
+
+.statCard {
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1rem);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.statCard.attended {
+    border-left: 4px solid #10b981;
+}
+
+.statCard.absent {
+    border-left: 4px solid #ef4444;
+}
+
+.statCard.normal {
+    border-left: 4px solid #3b82f6;
+}
+
+.statCard.late {
+    border-left: 4px solid #f59e0b;
+}
+
+.statCard.earlyLeave {
+    border-left: 4px solid #f97316;
+}
+
+.statIcon {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    line-height: 1;
+}
+
+.statInfo {
+    flex: 1;
+}
+
+.statLabel {
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    color: #6b7280;
+    margin-bottom: clamp(0.25rem, 0.5vw, 0.5rem);
+}
+
+.statValue {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.dateDisplay {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    padding: clamp(0.8rem, 2vw, 1rem);
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dateDisplay span {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 600;
+    color: #374151;
+}
+
+.btnRefresh {
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btnRefresh:hover {
+    background: #2563eb;
+}
+
+.dashboardTable {
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.dashboardTable table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.dashboardTable thead {
+    background: #f9fafb;
+}
+
+.dashboardTable th {
+    padding: clamp(0.75rem, 1.5vw, 1rem);
+    text-align: left;
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.dashboardTable td {
+    padding: clamp(0.75rem, 1.5vw, 1rem);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    color: #1f2937;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboardTable tbody tr {
+    transition: background 0.2s;
+}
+
+.dashboardTable tbody tr:hover {
+    background: #f9fafb;
+}
+
+.dashboardTable tbody tr.absent {
+    background: #fef2f2;
+}
+
+.dashboardTable tbody tr.normal {
+    background: #f0fdf4;
+}
+
+.dashboardTable tbody tr.late {
+    background: #fffbeb;
+}
+
+.dashboardTable tbody tr.earlyLeave {
+    background: #fff7ed;
+}
+
+.badge {
+    display: inline-block;
+    padding: clamp(0.25rem, 0.5vw, 0.375rem) clamp(0.5rem, 1vw, 0.75rem);
+    border-radius: clamp(4px, 0.5vw, 6px);
+    font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+    font-weight: 500;
+}
+
+.badge.normal {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge.late {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge.earlyLeave {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+.badge.absent {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge:not(.normal):not(.late):not(.earlyLeave):not(.absent) {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.loading {
+    color: #6b7280;
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .dashboardStats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dateDisplay {
+        flex-direction: column;
+        gap: clamp(0.5rem, 1vw, 1rem);
+        align-items: stretch;
+    }
+
+    .btnRefresh {
+        width: 100%;
+    }
+
+    .dashboardTable {
+        overflow-x: scroll;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboardStats {
+        grid-template-columns: 1fr;
+    }
+}

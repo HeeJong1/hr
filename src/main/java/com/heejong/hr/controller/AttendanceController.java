@@ -208,4 +208,21 @@ public class AttendanceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    /**
+     * 오늘 날짜 기준 모든 직원의 출근/미출근 현황 조회 (boss 대시보드용)
+     */
+    @GetMapping("/dashboard/today")
+    public ResponseEntity<Map<String, Object>> getTodayDashboard() {
+        try {
+            Map<String, Object> dashboard = attendanceService.getTodayDashboard();
+
+            return ResponseEntity.ok(dashboard);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

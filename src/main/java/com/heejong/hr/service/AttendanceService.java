@@ -3,14 +3,20 @@ package com.heejong.hr.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.heejong.hr.entity.Attendance;
+import com.heejong.hr.entity.Member;
 import com.heejong.hr.mapper.AttendanceMapper;
+import com.heejong.hr.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceService {
 
     private final AttendanceMapper attendanceMapper;
+    private final EmployeeService employeeService;
 
     // 정상 출근 기준 시간 (9시)
     private static final LocalTime NORMAL_CHECK_IN_TIME = LocalTime.of(9, 0);
@@ -156,5 +163,88 @@ public class AttendanceService {
         if (deleted == 0) {
             throw new IllegalArgumentException("삭제할 출퇴근 기록을 찾을 수 없습니다.");
         }
+    }
+
+    /**
+     * 오늘 날짜 기준 모든 직원의 출근/미출근 현황 조회 (boss 대시보드용)
+     */
+    public Map<String, Object> getTodayDashboard() {
+        LocalDate today = LocalDate.now();
+        
+        // 모든 직원 조회
+        List<Member> allEmployees = employeeService.getAllEmployees();
+        
+        // 오늘 날짜의 출근 기록 조회
+        List<Attendance> todayAttendanceList = attendanceMapper.findByDate(today);
+        
+        // 출근 기록을 memberNo를 키로 하는 Map으로 변환
+        Map<Long, Attendance> attendanceMap = todayAttendanceList.stream()
+            .collect(Collectors.toMap(Attendance::getMemberNo, attendance -> attendance));
+        
+        // 직원별 출근 현황 리스트 생성
+        List<Map<String, Object>> employeeStatusList = allEmployees.stream()
+            .map(employee -> {
+                Map<String, Object> status = new HashMap<>();
+                status.put("memberNo", employee.getMemberNo());
+                status.put("id", employee.getId());
+                status.put("name", employee.getName());
+                status.put("email", employee.getEmail());
+                status.put("role", employee.getRole());
+                
+                Attendance attendance = attendanceMap.get(employee.getMemberNo());
+                
+                if (attendance != null) {
+                    // 출근함
+                    status.put("hasAttended", true);
+                    status.put("checkInTime", attendance.getCheckInTime() != null 
+                        ? attendance.getCheckInTime().format(DateTimeFormatter.ofPattern("HH:mm")) 
+                        : null);
+                    status.put("checkOutTime", attendance.getCheckOutTime() != null 
+                        ? attendance.getCheckOutTime().format(DateTimeFormatter.ofPattern("HH:mm")) 
+                        : null);
+                    status.put("status", attendance.getStatus());
+                    status.put("workMinutes", attendance.getWorkMinutes());
+                    status.put("workHours", attendance.getWorkHours());
+                } else {
+                    // 미출근
+                    status.put("hasAttended", false);
+                    status.put("checkInTime", null);
+                    status.put("checkOutTime", null);
+                    status.put("status", "ABSENT");
+                    status.put("workMinutes", null);
+                    status.put("workHours", "0:00");
+                }
+                
+                return status;
+            })
+            .collect(Collectors.toList());
+        
+        // 통계 계산
+        long totalEmployees = allEmployees.size();
+        long attendedCount = todayAttendanceList.size();
+        long absentCount = totalEmployees - attendedCount;
+        long normalCount = todayAttendanceList.stream()
+            .filter(a -> "NORMAL".equals(a.getStatus()))
+            .count();
+        long lateCount = todayAttendanceList.stream()
+            .filter(a -> "LATE".equals(a.getStatus()))
+            .count();
+        long earlyLeaveCount = todayAttendanceList.stream()
+            .filter(a -> "EARLY_LEAVE".equals(a.getStatus()))
+            .count();
+        
+        Map<String, Object> dashboard = new HashMap<>();
+        dashboard.put("date", today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        dashboard.put("employees", employeeStatusList);
+        dashboard.put("statistics", Map.of(
+            "total", totalEmployees,
+            "attended", attendedCount,
+            "absent", absentCount,
+            "normal", normalCount,
+            "late", lateCount,
+            "earlyLeave", earlyLeaveCount
+        ));
+        
+        return dashboard;
     }
 }

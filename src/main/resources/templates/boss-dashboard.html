@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출근 현황 대시보드</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/boss-dashboard.css">
+</head>
+
+<body>
+    <section class="layoutSection">
+        <!-- 모바일 메뉴 토글 -->
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+
+        <!-- 사이드바 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <h2>HR 시스템</h2>
+            </div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/boss/dashboard" class="menuItem active">👔 출근 현황</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem">💰 급여관리</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+
+        <!-- 메인 컨텐츠 -->
+        <div class="mainContent">
+            <!-- 헤더 -->
+            <header class="header">
+                <h1>출근 현황 대시보드</h1>
+                <div class="userInfo">
+                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
+                        <span id="userName">사용자</span>
+                    </a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+
+            <!-- 컨텐츠 -->
+            <main class="content">
+                <!-- 통계 카드 -->
+                <div class="dashboardStats" id="dashboardStats">
+                    <div class="statCard">
+                        <div class="statIcon">👥</div>
+                        <div class="statInfo">
+                            <div class="statLabel">전체 직원</div>
+                            <div class="statValue" id="totalEmployees">-</div>
+                        </div>
+                    </div>
+                    <div class="statCard attended">
+                        <div class="statIcon">✅</div>
+                        <div class="statInfo">
+                            <div class="statLabel">출근</div>
+                            <div class="statValue" id="attendedCount">-</div>
+                        </div>
+                    </div>
+                    <div class="statCard absent">
+                        <div class="statIcon">❌</div>
+                        <div class="statInfo">
+                            <div class="statLabel">미출근</div>
+                            <div class="statValue" id="absentCount">-</div>
+                        </div>
+                    </div>
+                    <div class="statCard normal">
+                        <div class="statIcon">🟢</div>
+                        <div class="statInfo">
+                            <div class="statLabel">정상 출근</div>
+                            <div class="statValue" id="normalCount">-</div>
+                        </div>
+                    </div>
+                    <div class="statCard late">
+                        <div class="statIcon">🟡</div>
+                        <div class="statInfo">
+                            <div class="statLabel">지각</div>
+                            <div class="statValue" id="lateCount">-</div>
+                        </div>
+                    </div>
+                    <div class="statCard earlyLeave">
+                        <div class="statIcon">🟠</div>
+                        <div class="statInfo">
+                            <div class="statLabel">조퇴</div>
+                            <div class="statValue" id="earlyLeaveCount">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 날짜 표시 -->
+                <div class="dateDisplay">
+                    <span id="currentDate"></span>
+                    <button class="btnRefresh" onclick="loadDashboard()">🔄 새로고침</button>
+                </div>
+
+                <!-- 직원 목록 테이블 -->
+                <div class="dashboardTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>이름</th>
+                                <th>ID</th>
+                                <th>출근 상태</th>
+                                <th>출근 시간</th>
+                                <th>퇴근 시간</th>
+                                <th>근무 시간</th>
+                                <th>상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 2rem;">
+                                    <div class="loading">데이터를 불러오는 중...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+
+            <!-- 푸터 -->
+            <footer class="footer">
+                <div class="footerContent">
+                    <div>
+                        <strong>HR Management System</strong>
+                        <p>인사관리 시스템</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    © 2024 HR Management System. All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <script>
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('memberNo');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userEmail');
+                localStorage.removeItem('userName');
+                localStorage.removeItem('userRole');
+                alert('로그아웃되었습니다.');
+                window.location.href = '/login';
+            }
+        }
+
+        // 페이지 로드 시 토큰 확인 및 권한 체크
+        window.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const userRole = localStorage.getItem('userRole');
+
+            if (!token) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/login';
+                return;
+            }
+
+            // boss 권한 체크
+            if (userRole !== 'boss' && userRole !== 'ROLE_BOSS' && userRole !== 'BOSS') {
+                alert('접근 권한이 없습니다.');
+                window.location.href = '/home';
+                return;
+            }
+
+            // 사용자 정보 표시
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('userName').textContent = userName;
+            }
+
+            // 대시보드 데이터 로드
+            loadDashboard();
+        });
+
+        // 대시보드 데이터 로드
+        async function loadDashboard() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/attendance/dashboard/today', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('데이터를 불러오는데 실패했습니다.');
+                }
+
+                const data = await response.json();
+                
+                // 날짜 표시
+                document.getElementById('currentDate').textContent = 
+                    `${data.date} 출근 현황`;
+
+                // 통계 업데이트
+                const stats = data.statistics;
+                document.getElementById('totalEmployees').textContent = stats.total;
+                document.getElementById('attendedCount').textContent = stats.attended;
+                document.getElementById('absentCount').textContent = stats.absent;
+                document.getElementById('normalCount').textContent = stats.normal;
+                document.getElementById('lateCount').textContent = stats.late;
+                document.getElementById('earlyLeaveCount').textContent = stats.earlyLeave;
+
+                // 직원 목록 테이블 업데이트
+                const tbody = document.getElementById('employeeTableBody');
+                tbody.innerHTML = '';
+
+                if (data.employees && data.employees.length > 0) {
+                    data.employees.forEach(employee => {
+                        const row = document.createElement('tr');
+                        
+                        // 출근 상태에 따른 스타일
+                        let statusClass = '';
+                        let statusText = '';
+                        let statusBadge = '';
+
+                        if (!employee.hasAttended) {
+                            statusClass = 'absent';
+                            statusText = '미출근';
+                            statusBadge = '<span class="badge absent">미출근</span>';
+                        } else {
+                            switch(employee.status) {
+                                case 'NORMAL':
+                                    statusClass = 'normal';
+                                    statusText = '정상';
+                                    statusBadge = '<span class="badge normal">정상</span>';
+                                    break;
+                                case 'LATE':
+                                    statusClass = 'late';
+                                    statusText = '지각';
+                                    statusBadge = '<span class="badge late">지각</span>';
+                                    break;
+                                case 'EARLY_LEAVE':
+                                    statusClass = 'earlyLeave';
+                                    statusText = '조퇴';
+                                    statusBadge = '<span class="badge earlyLeave">조퇴</span>';
+                                    break;
+                                default:
+                                    statusClass = '';
+                                    statusText = employee.status;
+                                    statusBadge = `<span class="badge">${employee.status}</span>`;
+                            }
+                        }
+
+                        row.className = statusClass;
+                        row.innerHTML = `
+                            <td>${employee.name || '-'}</td>
+                            <td>${employee.id || '-'}</td>
+                            <td>${employee.hasAttended ? '✅ 출근' : '❌ 미출근'}</td>
+                            <td>${employee.checkInTime || '-'}</td>
+                            <td>${employee.checkOutTime || '-'}</td>
+                            <td>${employee.workHours || '0:00'}</td>
+                            <td>${statusBadge}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">
+                                등록된 직원이 없습니다.
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('employeeTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: red;">
+                            데이터를 불러오는 중 오류가 발생했습니다: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

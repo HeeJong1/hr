@@ -75,4 +75,9 @@ public class ViewController {
     public String noticeWritePage() {
         return "noticeWrite";
     }
+
+    @GetMapping("/boss/dashboard")
+    public String bossDashboardPage() {
+        return "boss-dashboard";
+    }
 }
