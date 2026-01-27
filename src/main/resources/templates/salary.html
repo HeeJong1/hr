@@ -21,11 +21,14 @@
             </div>
             <nav class="sidebarMenu">
                 <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/boss/dashboard" class="menuItem bossOnly">👔 출근 현황</a>
+                <a href="/attendance/statistics" class="menuItem">📈 출근 통계</a>
                 <a href="/notice" class="menuItem">📢 공지사항</a>
                 <a href="/leave" class="menuItem">📅 연차관리</a>
                 <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
                 <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
                 <a href="/salary" class="menuItem active">💰 급여관리</a>
+                <a href="/salary/statement" class="menuItem">💵 월급 내역서</a>
                 <a href="/employee" class="menuItem">👥 직원관리</a>
                 <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
             </nav>
@@ -136,7 +139,7 @@
             document.getElementById('userName').textContent = userName;
 
             // BOSS 메뉴 표시
-            if (userRole === 'ROLE_BOSS') {
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
                 document.querySelectorAll('.bossOnly').forEach(item => {
                     item.classList.add('show');
                 });

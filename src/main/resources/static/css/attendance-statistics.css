@@ -1,0 +1,172 @@
+/* 출근 통계 페이지 스타일 */
+
+.periodSelector {
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.8rem, 2vw, 1rem);
+    align-items: center;
+}
+
+.selectorGroup {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 1vw, 0.8rem);
+}
+
+.selectorGroup label {
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    color: #374151;
+    font-weight: 500;
+}
+
+.selectorGroup select {
+    padding: clamp(0.5rem, 1vw, 0.75rem);
+    border: 1px solid #d1d5db;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    background: white;
+    cursor: pointer;
+}
+
+.btnSearch, .btnDownload {
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+    border: none;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btnSearch {
+    background: #3b82f6;
+    color: white;
+}
+
+.btnSearch:hover {
+    background: #2563eb;
+}
+
+.btnDownload {
+    background: #10b981;
+    color: white;
+    margin-left: clamp(0.5rem, 1vw, 0.8rem);
+}
+
+.btnDownload:hover {
+    background: #059669;
+}
+
+.statisticsCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+}
+
+.statCard {
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: clamp(0.8rem, 2vw, 1rem);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.statCard.normal {
+    border-left: 4px solid #10b981;
+}
+
+.statCard.late {
+    border-left: 4px solid #f59e0b;
+}
+
+.statCard.earlyLeave {
+    border-left: 4px solid #f97316;
+}
+
+.statCard.absent {
+    border-left: 4px solid #ef4444;
+}
+
+.statCard.workTime {
+    border-left: 4px solid #3b82f6;
+}
+
+.statIcon {
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    line-height: 1;
+}
+
+.statInfo {
+    flex: 1;
+}
+
+.statLabel {
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    color: #6b7280;
+    margin-bottom: clamp(0.25rem, 0.5vw, 0.5rem);
+}
+
+.statValue {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.chartSection {
+    background: white;
+    border-radius: clamp(8px, 1vw, 12px);
+    padding: clamp(1.5rem, 3vw, 2rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chartSection h2 {
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    color: #1f2937;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.chartContainer {
+    position: relative;
+    height: 400px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .periodSelector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .selectorGroup {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btnSearch, .btnDownload {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+
+    .statisticsCards {
+        grid-template-columns: 1fr;
+    }
+
+    .chartContainer {
+        height: 300px;
+    }
+}

@@ -80,4 +80,14 @@ public class ViewController {
     public String bossDashboardPage() {
         return "boss-dashboard";
     }
+
+    @GetMapping("/attendance/statistics")
+    public String attendanceStatisticsPage() {
+        return "attendance-statistics";
+    }
+
+    @GetMapping("/salary/statement")
+    public String salaryStatementPage() {
+        return "salary-statement";
+    }
 }

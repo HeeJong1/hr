@@ -97,6 +97,114 @@
             color: #1565c0;
         }
 
+        .btnEditSalary {
+            padding: 0.4rem 0.8rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btnEditSalary:hover {
+            background-color: #2563eb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modalContent {
+            background-color: white;
+            margin: 5% auto;
+            padding: clamp(1.5rem, 3vw, 2rem);
+            border-radius: clamp(8px, 1vw, 12px);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: clamp(1rem, 2vw, 1.5rem);
+            top: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+
+        .formGroup {
+            margin-bottom: clamp(1rem, 2vw, 1.5rem);
+        }
+
+        .formGroup label {
+            display: block;
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+            color: #374151;
+            margin-bottom: clamp(0.5rem, 1vw, 0.75rem);
+            font-weight: 500;
+        }
+
+        .formGroup input {
+            width: 100%;
+            padding: clamp(0.5rem, 1vw, 0.75rem);
+            border: 1px solid #d1d5db;
+            border-radius: clamp(6px, 1vw, 8px);
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+            box-sizing: border-box;
+        }
+
+        .formGroup small {
+            display: block;
+            margin-top: clamp(0.25rem, 0.5vw, 0.5rem);
+            color: #6b7280;
+            font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+        }
+
+        .formActions {
+            display: flex;
+            gap: clamp(0.5rem, 1vw, 0.75rem);
+            justify-content: flex-end;
+            margin-top: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        .btnSave {
+            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: clamp(6px, 1vw, 8px);
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+            cursor: pointer;
+        }
+
+        .btnCancel {
+            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: clamp(6px, 1vw, 8px);
+            font-size: clamp(0.875rem, 1.5vw, 1rem);
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
             .employeeTable {
                 overflow-x: auto;
@@ -175,6 +283,8 @@
                                     <th>생년월일</th>
                                     <th>나이</th>
                                     <th>직급</th>
+                                    <th>연봉</th>
+                                    <th>작업</th>
                                 </tr>
                             </thead>
                             <tbody id="employeeListBody">
@@ -188,6 +298,27 @@
                     </div>
                 </div>
             </main>
+
+            <!-- 연봉 수정 모달 -->
+            <div id="editSalaryModal" class="modal" style="display: none;">
+                <div class="modalContent">
+                    <span class="close" onclick="closeEditSalaryModal()">&times;</span>
+                    <h2>연봉 수정</h2>
+                    <div class="formGroup">
+                        <label>직원명:</label>
+                        <span id="editEmployeeName"></span>
+                    </div>
+                    <div class="formGroup">
+                        <label>연봉 (만원 단위):</label>
+                        <input type="number" id="editAnnualSalaryInput" placeholder="예: 3400" min="0">
+                        <small>예: 3400 입력 시 연봉 3,400만원</small>
+                    </div>
+                    <div class="formActions">
+                        <button class="btnSave" onclick="updateEmployeeSalary()">저장</button>
+                        <button class="btnCancel" onclick="closeEditSalaryModal()">취소</button>
+                    </div>
+                </div>
+            </div>
 
             <!-- 푸터 -->
             <footer class="footer">
@@ -240,7 +371,7 @@
             document.getElementById('userName').textContent = userName;
 
             // BOSS 메뉴 표시
-            if (userRole === 'ROLE_BOSS') {
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
                 document.querySelectorAll('.bossOnly').forEach(item => {
                     item.classList.add('show');
                 });
@@ -270,15 +401,35 @@
                     // 직원 목록 표시
                     const tbody = document.getElementById('employeeListBody');
                     if (employees.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">등록된 직원이 없습니다.</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem;">등록된 직원이 없습니다.</td></tr>';
                         return;
                     }
 
-                    tbody.innerHTML = employees.map(emp => {
+                    // 연봉 정보 로드
+                    const employeesWithSalary = await Promise.all(employees.map(async (emp) => {
+                        try {
+                            const token = localStorage.getItem('token');
+                            const salaryResponse = await fetch(`/api/employees/${emp.memberNo}/annual-salary`, {
+                                headers: {
+                                    'Authorization': `Bearer ${token}`
+                                }
+                            });
+                            if (salaryResponse.ok) {
+                                const salaryData = await salaryResponse.json();
+                                emp.annualSalary = salaryData.annualSalary;
+                            }
+                        } catch (e) {
+                            console.error('Error loading salary:', e);
+                        }
+                        return emp;
+                    }));
+
+                    tbody.innerHTML = employeesWithSalary.map(emp => {
                         const roleBadgeClass = emp.role === 'ROLE_BOSS' ? 'boss' : 'user';
                         const roleText = emp.role === 'ROLE_BOSS' ? 'BOSS' : 'USER';
                         const age = emp.age !== null ? emp.age + '세' : '-';
                         const birthdate = emp.birthdate || '-';
+                        const annualSalary = emp.annualSalary ? parseInt(emp.annualSalary).toLocaleString() + '만원' : '미등록';
 
                         return `
                             <tr>
@@ -289,6 +440,12 @@
                                 <td>${birthdate}</td>
                                 <td>${age}</td>
                                 <td><span class="roleBadge ${roleBadgeClass}">${roleText}</span></td>
+                                <td>${annualSalary}</td>
+                                <td>
+                                    <button class="btnEditSalary" onclick="showEditSalaryModal(${emp.memberNo}, '${emp.name}', '${emp.annualSalary || ''}')">
+                                        연봉 수정
+                                    </button>
+                                </td>
                             </tr>
                         `;
                     }).join('');
@@ -298,6 +455,64 @@
             } catch (error) {
                 console.error('Error:', error);
                 alert('서버 연결에 실패했습니다.');
+            }
+        }
+
+        let currentEditMemberNo = null;
+
+        // 연봉 수정 모달 표시
+        function showEditSalaryModal(memberNo, name, currentSalary) {
+            currentEditMemberNo = memberNo;
+            document.getElementById('editEmployeeName').textContent = name;
+            document.getElementById('editAnnualSalaryInput').value = currentSalary || '';
+            document.getElementById('editSalaryModal').style.display = 'block';
+        }
+
+        // 연봉 수정 모달 닫기
+        function closeEditSalaryModal() {
+            document.getElementById('editSalaryModal').style.display = 'none';
+            currentEditMemberNo = null;
+            document.getElementById('editAnnualSalaryInput').value = '';
+        }
+
+        // 연봉 업데이트
+        async function updateEmployeeSalary() {
+            const annualSalary = document.getElementById('editAnnualSalaryInput').value;
+            if (!annualSalary || annualSalary <= 0) {
+                alert('올바른 연봉을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/employees/${currentEditMemberNo}/annual-salary`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ annualSalary: annualSalary })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || '연봉 업데이트에 실패했습니다.');
+                }
+
+                alert('연봉이 업데이트되었습니다.');
+                closeEditSalaryModal();
+                await loadEmployees();
+            } catch (error) {
+                console.error('Error updating annual salary:', error);
+                alert('연봉 업데이트 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('editSalaryModal');
+            if (event.target === modal) {
+                closeEditSalaryModal();
             }
         }
     </script>

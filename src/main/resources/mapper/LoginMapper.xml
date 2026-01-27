@@ -13,40 +13,41 @@
         <result property="name" column="name"/>
         <result property="role" column="role"/>
         <result property="birthdate" column="birthdate"/>
+        <result property="annualSalary" column="annual_salary"/>
     </resultMap>
 
     <!-- 이메일로 사용자 조회 -->
     <select id="findByEmail" parameterType="string" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate
+        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
         FROM member
         WHERE email = #{email}
     </select>
 
     <!-- ID로 사용자 조회 -->
     <select id="findById" parameterType="string" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate
+        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
         FROM member
         WHERE id = #{id}
     </select>
 
     <!-- 회원번호로 사용자 조회 -->
     <select id="findByMemberNo" parameterType="long" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate
+        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
         FROM member
         WHERE member_no = #{memberNo}
     </select>
 
     <!-- 로그인 인증 처리 -->
     <select id="authenticate" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate
+        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
         FROM member
         WHERE email = #{email}
     </select>
 
     <!-- 회원 가입 -->
     <insert id="insertMember" parameterType="com.heejong.hr.entity.Member">
-        INSERT INTO member (id, email, password, name, role, birthdate)
-        VALUES (#{id}, #{email}, #{password}, #{name}, #{role}, #{birthdate})
+        INSERT INTO member (id, email, password, name, role, birthdate, annual_salary)
+        VALUES (#{id}, #{email}, #{password}, #{name}, #{role}, #{birthdate}, #{annualSalary})
     </insert>
 
     <!-- 회원 탈퇴 -->
@@ -57,9 +58,16 @@
 
     <!-- 모든 회원 조회 (관리자용) -->
     <select id="findAll" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate
+        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
         FROM member
         ORDER BY member_no ASC
     </select>
+
+    <!-- 회원 연봉 업데이트 -->
+    <update id="updateAnnualSalary">
+        UPDATE member
+        SET annual_salary = #{annualSalary}
+        WHERE member_no = #{memberNo}
+    </update>
 
 </mapper>

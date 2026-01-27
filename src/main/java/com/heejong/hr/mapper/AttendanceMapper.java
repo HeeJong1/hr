@@ -2,6 +2,7 @@ package com.heejong.hr.mapper;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -55,4 +56,19 @@ public interface AttendanceMapper {
      * 출퇴근 기록 삭제
      */
     int deleteAttendance(@Param("attendanceNo") Long attendanceNo);
+
+    /**
+     * 특정 회원의 월별 출근 통계 조회
+     */
+    Map<String, Object> getMonthlyStatistics(@Param("memberNo") Long memberNo, @Param("year") int year, @Param("month") int month);
+
+    /**
+     * 특정 회원의 연도별 출근 통계 조회
+     */
+    Map<String, Object> getYearlyStatistics(@Param("memberNo") Long memberNo, @Param("year") int year);
+
+    /**
+     * 특정 기간의 모든 직원 출근 기록 조회 (리포트용)
+     */
+    List<Attendance> findByDateRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

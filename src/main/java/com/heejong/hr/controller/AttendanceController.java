@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.heejong.hr.entity.Attendance;
 import com.heejong.hr.service.AttendanceService;
+import com.heejong.hr.service.ReportService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final ReportService reportService;
 
     /**
      * 출근 등록
@@ -223,6 +225,88 @@ public class AttendanceController {
             response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 출근 통계 조회 (월별)
+     */
+    @GetMapping("/statistics/monthly/{memberNo}")
+    public ResponseEntity<Map<String, Object>> getMonthlyStatistics(
+            @PathVariable Long memberNo,
+            @RequestParam int year,
+            @RequestParam int month) {
+        try {
+            Map<String, Object> statistics = attendanceService.getMonthlyStatistics(memberNo, year, month);
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 출근 통계 조회 (연도별)
+     */
+    @GetMapping("/statistics/yearly/{memberNo}")
+    public ResponseEntity<Map<String, Object>> getYearlyStatistics(
+            @PathVariable Long memberNo,
+            @RequestParam int year) {
+        try {
+            Map<String, Object> statistics = attendanceService.getYearlyStatistics(memberNo, year);
+            return ResponseEntity.ok(statistics);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 출근 리포트 엑셀 다운로드
+     */
+    @GetMapping("/report/excel/{memberNo}")
+    public ResponseEntity<byte[]> downloadAttendanceReportExcel(
+            @PathVariable Long memberNo,
+            @RequestParam int year,
+            @RequestParam int month) {
+        try {
+            byte[] excelData = reportService.exportAttendanceReportToExcel(memberNo, year, month);
+            
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    .header("Content-Disposition", 
+                            String.format("attachment; filename=attendance_report_%d_%d_%d.xlsx", memberNo, year, month))
+                    .body(excelData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 출근 리포트 PDF 다운로드
+     */
+    @GetMapping("/report/pdf/{memberNo}")
+    public ResponseEntity<byte[]> downloadAttendanceReportPdf(
+            @PathVariable Long memberNo,
+            @RequestParam int year,
+            @RequestParam int month,
+            @RequestParam String memberName) {
+        try {
+            byte[] pdfData = reportService.exportAttendanceReportToPdf(memberNo, year, month, memberName);
+            
+            return ResponseEntity.ok()
+                    .header("Content-Type", "application/pdf")
+                    .header("Content-Disposition", 
+                            String.format("attachment; filename=attendance_report_%d_%d_%d.pdf", memberNo, year, month))
+                    .body(pdfData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

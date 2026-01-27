@@ -170,81 +170,166 @@ public class AttendanceService {
      */
     public Map<String, Object> getTodayDashboard() {
         LocalDate today = LocalDate.now();
-        
+
         // 모든 직원 조회
         List<Member> allEmployees = employeeService.getAllEmployees();
-        
+
         // 오늘 날짜의 출근 기록 조회
         List<Attendance> todayAttendanceList = attendanceMapper.findByDate(today);
-        
+
         // 출근 기록을 memberNo를 키로 하는 Map으로 변환
         Map<Long, Attendance> attendanceMap = todayAttendanceList.stream()
-            .collect(Collectors.toMap(Attendance::getMemberNo, attendance -> attendance));
-        
+                .collect(Collectors.toMap(Attendance::getMemberNo, attendance -> attendance));
+
         // 직원별 출근 현황 리스트 생성
         List<Map<String, Object>> employeeStatusList = allEmployees.stream()
-            .map(employee -> {
-                Map<String, Object> status = new HashMap<>();
-                status.put("memberNo", employee.getMemberNo());
-                status.put("id", employee.getId());
-                status.put("name", employee.getName());
-                status.put("email", employee.getEmail());
-                status.put("role", employee.getRole());
-                
-                Attendance attendance = attendanceMap.get(employee.getMemberNo());
-                
-                if (attendance != null) {
-                    // 출근함
-                    status.put("hasAttended", true);
-                    status.put("checkInTime", attendance.getCheckInTime() != null 
-                        ? attendance.getCheckInTime().format(DateTimeFormatter.ofPattern("HH:mm")) 
-                        : null);
-                    status.put("checkOutTime", attendance.getCheckOutTime() != null 
-                        ? attendance.getCheckOutTime().format(DateTimeFormatter.ofPattern("HH:mm")) 
-                        : null);
-                    status.put("status", attendance.getStatus());
-                    status.put("workMinutes", attendance.getWorkMinutes());
-                    status.put("workHours", attendance.getWorkHours());
-                } else {
-                    // 미출근
-                    status.put("hasAttended", false);
-                    status.put("checkInTime", null);
-                    status.put("checkOutTime", null);
-                    status.put("status", "ABSENT");
-                    status.put("workMinutes", null);
-                    status.put("workHours", "0:00");
-                }
-                
-                return status;
-            })
-            .collect(Collectors.toList());
-        
+                .map(employee -> {
+                    Map<String, Object> status = new HashMap<>();
+                    status.put("memberNo", employee.getMemberNo());
+                    status.put("id", employee.getId());
+                    status.put("name", employee.getName());
+                    status.put("email", employee.getEmail());
+                    status.put("role", employee.getRole());
+
+                    Attendance attendance = attendanceMap.get(employee.getMemberNo());
+
+                    if (attendance != null) {
+                        // 출근함
+                        status.put("hasAttended", true);
+                        status.put("checkInTime", attendance.getCheckInTime() != null
+                                ? attendance.getCheckInTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                                : null);
+                        status.put("checkOutTime", attendance.getCheckOutTime() != null
+                                ? attendance.getCheckOutTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+                                : null);
+                        status.put("status", attendance.getStatus());
+                        status.put("workMinutes", attendance.getWorkMinutes());
+                        status.put("workHours", attendance.getWorkHours());
+                    } else {
+                        // 미출근
+                        status.put("hasAttended", false);
+                        status.put("checkInTime", null);
+                        status.put("checkOutTime", null);
+                        status.put("status", "ABSENT");
+                        status.put("workMinutes", null);
+                        status.put("workHours", "0:00");
+                    }
+
+                    return status;
+                })
+                .collect(Collectors.toList());
+
         // 통계 계산
         long totalEmployees = allEmployees.size();
         long attendedCount = todayAttendanceList.size();
         long absentCount = totalEmployees - attendedCount;
         long normalCount = todayAttendanceList.stream()
-            .filter(a -> "NORMAL".equals(a.getStatus()))
-            .count();
+                .filter(a -> "NORMAL".equals(a.getStatus()))
+                .count();
         long lateCount = todayAttendanceList.stream()
-            .filter(a -> "LATE".equals(a.getStatus()))
-            .count();
+                .filter(a -> "LATE".equals(a.getStatus()))
+                .count();
         long earlyLeaveCount = todayAttendanceList.stream()
-            .filter(a -> "EARLY_LEAVE".equals(a.getStatus()))
-            .count();
-        
+                .filter(a -> "EARLY_LEAVE".equals(a.getStatus()))
+                .count();
+
         Map<String, Object> dashboard = new HashMap<>();
         dashboard.put("date", today.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         dashboard.put("employees", employeeStatusList);
         dashboard.put("statistics", Map.of(
-            "total", totalEmployees,
-            "attended", attendedCount,
-            "absent", absentCount,
-            "normal", normalCount,
-            "late", lateCount,
-            "earlyLeave", earlyLeaveCount
+                "total", totalEmployees,
+                "attended", attendedCount,
+                "absent", absentCount,
+                "normal", normalCount,
+                "late", lateCount,
+                "earlyLeave", earlyLeaveCount
         ));
-        
+
         return dashboard;
     }
+
+    /**
+     * 월별 출근 통계 조회
+     */
+    public Map<String, Object> getMonthlyStatistics(Long memberNo, int year, int month) {
+        Map<String, Object> statistics = attendanceMapper.getMonthlyStatistics(memberNo, year, month);
+
+        // 통계 데이터 가공 (PostgreSQL은 대소문자를 구분하므로 쿼리에서 따옴표로 감싼 키 사용)
+        Integer totalDays = getIntegerValue(statistics, "totalDays", "totaldays");
+        Integer normalDays = getIntegerValue(statistics, "normalDays", "normaldays");
+        Integer lateDays = getIntegerValue(statistics, "lateDays", "latedays");
+        Integer earlyLeaveDays = getIntegerValue(statistics, "earlyLeaveDays", "earlyleavedays");
+        Integer absentDays = getIntegerValue(statistics, "absentDays", "absentdays");
+        Integer totalWorkMinutes = getIntegerValue(statistics, "totalWorkMinutes", "totalworkminutes");
+
+        int hours = totalWorkMinutes != null ? totalWorkMinutes / 60 : 0;
+        int minutes = totalWorkMinutes != null ? totalWorkMinutes % 60 : 0;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalDays", totalDays != null ? totalDays : 0);
+        result.put("normalDays", normalDays != null ? normalDays : 0);
+        result.put("lateDays", lateDays != null ? lateDays : 0);
+        result.put("earlyLeaveDays", earlyLeaveDays != null ? earlyLeaveDays : 0);
+        result.put("absentDays", absentDays != null ? absentDays : 0);
+        result.put("totalWorkMinutes", totalWorkMinutes != null ? totalWorkMinutes : 0);
+        result.put("totalWorkHours", String.format("%d:%02d", hours, minutes));
+
+        return result;
+    }
+
+    /**
+     * 연도별 출근 통계 조회
+     */
+    public Map<String, Object> getYearlyStatistics(Long memberNo, int year) {
+        Map<String, Object> statistics = attendanceMapper.getYearlyStatistics(memberNo, year);
+
+        Integer totalDays = getIntegerValue(statistics, "totalDays", "totaldays");
+        Integer normalDays = getIntegerValue(statistics, "normalDays", "normaldays");
+        Integer lateDays = getIntegerValue(statistics, "lateDays", "latedays");
+        Integer earlyLeaveDays = getIntegerValue(statistics, "earlyLeaveDays", "earlyleavedays");
+        Integer absentDays = getIntegerValue(statistics, "absentDays", "absentdays");
+        Integer totalWorkMinutes = getIntegerValue(statistics, "totalWorkMinutes", "totalworkminutes");
+
+        int hours = totalWorkMinutes != null ? totalWorkMinutes / 60 : 0;
+        int minutes = totalWorkMinutes != null ? totalWorkMinutes % 60 : 0;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalDays", totalDays != null ? totalDays : 0);
+        result.put("normalDays", normalDays != null ? normalDays : 0);
+        result.put("lateDays", lateDays != null ? lateDays : 0);
+        result.put("earlyLeaveDays", earlyLeaveDays != null ? earlyLeaveDays : 0);
+        result.put("absentDays", absentDays != null ? absentDays : 0);
+        result.put("totalWorkMinutes", totalWorkMinutes != null ? totalWorkMinutes : 0);
+        result.put("totalWorkHours", String.format("%d:%02d", hours, minutes));
+
+        return result;
+    }
+
+    /**
+     * Map에서 Integer 값을 안전하게 가져오는 헬퍼 메서드
+     */
+    private Integer getIntegerValue(Map<String, Object> map, String key1, String key2) {
+        Object value = map.get(key1);
+        if (value == null) {
+            value = map.get(key2);
+        }
+        if (value == null) {
+            return 0;
+        }
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        if (value instanceof Long) {
+            return ((Long) value).intValue();
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        try {
+            return Integer.parseInt(value.toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
 }

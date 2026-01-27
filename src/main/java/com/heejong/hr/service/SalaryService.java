@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.heejong.hr.entity.Salary;
 import com.heejong.hr.entity.SalaryPayment;
 import com.heejong.hr.mapper.SalaryMapper;
+import com.heejong.hr.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class SalaryService {
 
     private final SalaryMapper salaryMapper;
+    private final EmployeeService employeeService;
 
     // ========== 급여 정보 관리 ==========
 
@@ -76,6 +78,64 @@ public class SalaryService {
     }
 
     // ========== 급여 지급 관리 ==========
+
+    /**
+     * 급여 지급 생성 (자동 계산) - 연봉 기반
+     */
+    @Transactional
+    public SalaryPayment createSalaryPaymentFromAnnualSalary(Long memberNo, int year, int month) {
+        // 연봉 기반 월급 계산
+        BigDecimal monthlySalary = employeeService.calculateMonthlySalary(memberNo);
+        if (monthlySalary == null) {
+            throw new IllegalArgumentException("연봉 정보가 등록되지 않았습니다.");
+        }
+
+        // 이미 해당 월 급여가 있는지 확인
+        SalaryPayment existing = salaryMapper.findPaymentByMemberAndMonth(memberNo, year, month);
+        if (existing != null) {
+            throw new IllegalArgumentException("해당 월 급여가 이미 등록되어 있습니다.");
+        }
+
+        SalaryPayment payment = new SalaryPayment();
+        payment.setMemberNo(memberNo);
+        payment.setPaymentYear(year);
+        payment.setPaymentMonth(month);
+        payment.setBaseSalary(monthlySalary);
+        payment.setPositionAllowance(BigDecimal.ZERO);
+        payment.setMealAllowance(BigDecimal.ZERO);
+        payment.setTransportAllowance(BigDecimal.ZERO);
+        payment.setOvertimePay(BigDecimal.ZERO);
+        payment.setBonus(BigDecimal.ZERO);
+
+        // 총 지급액 계산
+        BigDecimal totalAmount = monthlySalary;
+        payment.setTotalAmount(totalAmount);
+
+        // 공제액 계산
+        BigDecimal incomeTax = totalAmount.multiply(new BigDecimal("0.05")).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal nationalPension = totalAmount.multiply(new BigDecimal("0.045")).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal healthInsurance = totalAmount.multiply(new BigDecimal("0.0335")).setScale(0, RoundingMode.HALF_UP);
+        BigDecimal employmentInsurance = totalAmount.multiply(new BigDecimal("0.008")).setScale(0, RoundingMode.HALF_UP);
+
+        payment.setIncomeTax(incomeTax);
+        payment.setNationalPension(nationalPension);
+        payment.setHealthInsurance(healthInsurance);
+        payment.setEmploymentInsurance(employmentInsurance);
+
+        BigDecimal totalDeduction = incomeTax.add(nationalPension).add(healthInsurance).add(employmentInsurance);
+        payment.setTotalDeduction(totalDeduction);
+
+        // 실 지급액
+        BigDecimal netAmount = totalAmount.subtract(totalDeduction);
+        payment.setNetAmount(netAmount);
+
+        payment.setPaymentDate(LocalDate.now());
+        payment.setStatus("PENDING");
+
+        salaryMapper.insertSalaryPayment(payment);
+
+        return salaryMapper.findPaymentByMemberAndMonth(memberNo, year, month);
+    }
 
     /**
      * 급여 지급 생성 (자동 계산)

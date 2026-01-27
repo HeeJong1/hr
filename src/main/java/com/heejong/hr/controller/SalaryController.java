@@ -279,4 +279,33 @@ public class SalaryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+    /**
+     * 연봉 기반 월급 지급 생성
+     */
+    @PostMapping("/payment/annual-salary")
+    public ResponseEntity<Map<String, Object>> createPaymentFromAnnualSalary(@RequestBody Map<String, Object> body) {
+        try {
+            Long memberNo = Long.valueOf(body.get("memberNo").toString());
+            int year = Integer.parseInt(body.get("year").toString());
+            int month = Integer.parseInt(body.get("month").toString());
+
+            SalaryPayment payment = salaryService.createSalaryPaymentFromAnnualSalary(memberNo, year, month);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "연봉 기반 급여가 생성되었습니다.");
+            response.put("payment", payment);
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

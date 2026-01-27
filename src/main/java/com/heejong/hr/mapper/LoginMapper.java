@@ -3,6 +3,7 @@ package com.heejong.hr.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.heejong.hr.entity.Member;
 
@@ -64,5 +65,14 @@ public interface LoginMapper {
      * @return 모든 회원 목록
      */
     List<Member> findAll();
+
+    /**
+     * 회원 연봉 업데이트
+     *
+     * @param memberNo 회원번호
+     * @param annualSalary 암호화된 연봉
+     * @return 업데이트된 행 수
+     */
+    int updateAnnualSalary(@Param("memberNo") Long memberNo, @Param("annualSalary") String annualSalary);
 
 }
