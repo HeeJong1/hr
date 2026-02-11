@@ -75,4 +75,25 @@ public interface LoginMapper {
      */
     int updateAnnualSalary(@Param("memberNo") Long memberNo, @Param("annualSalary") String annualSalary);
 
+    /**
+     * 검색/필터 조건으로 회원 목록 조회 (페이징)
+     */
+    List<Member> findWithPaging(@Param("keyword") String keyword, @Param("role") String role,
+                               @Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     * 검색/필터 조건에 맞는 회원 수
+     */
+    int countBySearch(@Param("keyword") String keyword, @Param("role") String role);
+
+    /**
+     * 프로필 수정 (이름, 연락처)
+     */
+    int updateProfile(@Param("memberNo") Long memberNo, @Param("name") String name, @Param("phone") String phone);
+
+    /**
+     * 비밀번호 변경
+     */
+    int updatePassword(@Param("memberNo") Long memberNo, @Param("password") String password);
+
 }

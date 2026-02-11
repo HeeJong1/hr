@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.heejong.hr.entity.Notice;
 import com.heejong.hr.mapper.NoticeMapper;
+import com.heejong.hr.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class NoticeService {
 
     private final NoticeMapper noticeMapper;
+    private final NotificationService notificationService;
 
     /**
      * 공지사항 작성
@@ -32,6 +34,7 @@ public class NoticeService {
         if (result == 0) {
             throw new RuntimeException("공지사항 작성에 실패했습니다");
         }
+        notificationService.createBroadcast("NOTICE_NEW", "새 공지", title, null);
     }
 
     /**
@@ -79,6 +82,20 @@ public class NoticeService {
     }
 
     /**
+     * 공지 읽음 처리
+     */
+    public void markAsRead(Long memberNo, Long noticeNo) {
+        noticeMapper.insertNoticeRead(memberNo, noticeNo);
+    }
+
+    /**
+     * 회원이 읽은 공지 번호 목록
+     */
+    public java.util.List<Long> getReadNoticeNos(Long memberNo) {
+        return noticeMapper.findReadNoticeNosByMember(memberNo);
+    }
+
+    /**
      * 모든 공지사항 조회
      */
     public List<Notice> getAllNotices() {
@@ -96,13 +113,14 @@ public class NoticeService {
     }
 
     /**
-     * 페이징 처리된 공지사항 조회
+     * 페이징 처리된 공지사항 조회 (memberNo 있으면 읽음 목록 포함)
      */
-    public Map<String, Object> getNoticesWithPaging(int page, int size) {
+    public Map<String, Object> getNoticesWithPaging(int page, int size, Long memberNo) {
         int offset = (page - 1) * size;
         List<Notice> notices = noticeMapper.findAllWithPaging(offset, size);
         int totalCount = noticeMapper.countAll();
         int totalPages = (int) Math.ceil((double) totalCount / size);
+        if (totalPages < 1) totalPages = 1;
 
         Map<String, Object> result = new HashMap<>();
         result.put("notices", notices);
@@ -110,22 +128,25 @@ public class NoticeService {
         result.put("totalPages", totalPages);
         result.put("totalCount", totalCount);
         result.put("size", size);
-
+        if (memberNo != null) {
+            result.put("readNoticeNos", noticeMapper.findReadNoticeNosByMember(memberNo));
+        }
         return result;
     }
 
     /**
-     * 페이징 처리된 검색 결과
+     * 페이징 처리된 검색 결과 (memberNo 있으면 읽음 목록 포함)
      */
-    public Map<String, Object> searchNoticesWithPaging(String keyword, int page, int size) {
+    public Map<String, Object> searchNoticesWithPaging(String keyword, int page, int size, Long memberNo) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            return getNoticesWithPaging(page, size);
+            return getNoticesWithPaging(page, size, memberNo);
         }
 
         int offset = (page - 1) * size;
         List<Notice> notices = noticeMapper.searchNoticesWithPaging(keyword.trim(), offset, size);
         int totalCount = noticeMapper.countByKeyword(keyword.trim());
         int totalPages = (int) Math.ceil((double) totalCount / size);
+        if (totalPages < 1) totalPages = 1;
 
         Map<String, Object> result = new HashMap<>();
         result.put("notices", notices);
@@ -134,7 +155,9 @@ public class NoticeService {
         result.put("totalCount", totalCount);
         result.put("size", size);
         result.put("keyword", keyword.trim());
-
+        if (memberNo != null) {
+            result.put("readNoticeNos", noticeMapper.findReadNoticeNosByMember(memberNo));
+        }
         return result;
     }
 }

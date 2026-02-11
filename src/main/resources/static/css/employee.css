@@ -1,0 +1,314 @@
+/* 직원관리 페이지 */
+
+.employeePage .headerUserLink {
+    color: #555;
+    text-decoration: none;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.employeeCard {
+    background-color: #f5f5f5;
+    border-radius: clamp(8px, 2vw, 12px);
+    padding: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employeeCard h3 {
+    color: #333;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+
+.statsRow {
+    display: flex;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    flex-wrap: wrap;
+}
+
+.statBox {
+    flex: 1;
+    min-width: clamp(120px, 25vw, 150px);
+    background-color: white;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    border-radius: clamp(6px, 1vw, 8px);
+    border-left: 4px solid #3498db;
+}
+
+.statLabel {
+    color: #7f8c8d;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    margin-bottom: 0.5rem;
+}
+
+.statValue {
+    color: #2c3e50;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: bold;
+}
+
+/* 테이블 영역 한쪽에 묶어서 표시 */
+.employeeTableBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-left: 0;
+    max-width: 100%;
+}
+
+.employeeFilterCard {
+    margin-bottom: 0;
+}
+
+.employeeFilterRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.employeeFilterRow .searchInput {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-width: 180px;
+    font-size: 0.95rem;
+}
+
+.employeeFilterRow .roleSelect {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.employeeFilterRow .btnSearch {
+    padding: 0.5rem 1rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.employeeFilterRow .btnExcelDownload {
+    padding: 0.5rem 1rem;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.employeeFilterRow .excelUploadLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.employeeFilterRow .excelUploadSpan {
+    padding: 0.5rem 1rem;
+    background: #9b59b6;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.employeeFilterRow .excelFileInput {
+    display: none;
+}
+
+.paginationBar {
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.employeeTableCard {
+    margin-bottom: 0;
+}
+
+.employeeTable {
+    width: 100%;
+    background-color: white;
+    border-radius: clamp(6px, 1vw, 8px);
+    overflow-x: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.employeeTable table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.employeeTable th,
+.employeeTable td {
+    padding: clamp(0.75rem, 2vw, 1rem);
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+}
+
+.employeeTable th {
+    background-color: #34495e;
+    color: white;
+    font-weight: 600;
+}
+
+.employeeTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.employeeTable .loadingCell {
+    text-align: center;
+    padding: 2rem;
+    color: #999;
+}
+
+.roleBadge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    font-weight: 600;
+}
+
+.roleBadge.boss {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.roleBadge.user {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.btnEditSalary {
+    padding: 0.4rem 0.8rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btnEditSalary:hover {
+    background-color: #2563eb;
+}
+
+/* 모달 */
+.employeeModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.employeeModal .modalContent {
+    background-color: white;
+    margin: 5% auto;
+    padding: clamp(1.5rem, 3vw, 2rem);
+    border-radius: clamp(8px, 1vw, 12px);
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.employeeModal .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    right: clamp(1rem, 2vw, 1.5rem);
+    top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.employeeModal .close:hover,
+.employeeModal .close:focus {
+    color: #000;
+}
+
+.employeeModal .formGroup {
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
+.employeeModal .formGroup label {
+    display: block;
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    color: #374151;
+    margin-bottom: clamp(0.5rem, 1vw, 0.75rem);
+    font-weight: 500;
+}
+
+.employeeModal .formGroup input {
+    width: 100%;
+    padding: clamp(0.5rem, 1vw, 0.75rem);
+    border: 1px solid #d1d5db;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    box-sizing: border-box;
+}
+
+.employeeModal .formGroup small {
+    display: block;
+    margin-top: clamp(0.25rem, 0.5vw, 0.5rem);
+    color: #6b7280;
+    font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+}
+
+.employeeModal .formActions {
+    display: flex;
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+    justify-content: flex-end;
+    margin-top: clamp(1.5rem, 3vw, 2rem);
+}
+
+.employeeModal .btnSave {
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    cursor: pointer;
+}
+
+.employeeModal .btnCancel {
+    padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: clamp(6px, 1vw, 8px);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .employeeTable {
+        overflow-x: auto;
+    }
+
+    .employeeFilterRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .employeeFilterRow .searchInput {
+        min-width: 100%;
+    }
+}

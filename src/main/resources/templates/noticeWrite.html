@@ -146,10 +146,8 @@
             document.getElementById('userName').textContent = userName;
 
             // BOSS 메뉴 표시
-            if (userRole === 'ROLE_BOSS') {
-                document.querySelectorAll('.bossOnly').forEach(item => {
-                    item.classList.add('show');
-                });
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => item.classList.add('show'));
             }
 
             // URL 파라미터 확인
@@ -162,7 +160,7 @@
                 if (mode === 'view') {
                     await loadNoticeForView(noticeNo);
                 } else if (mode === 'edit') {
-                    if (userRole !== 'ROLE_BOSS') {
+                    if (userRole !== 'ROLE_BOSS' && userRole !== 'boss' && userRole !== 'BOSS') {
                         alert('권한이 없습니다.');
                         window.location.href = '/notice';
                         return;
@@ -171,7 +169,7 @@
                 }
             } else {
                 // 새 글 작성 모드
-                if (userRole !== 'ROLE_BOSS') {
+                if (userRole !== 'ROLE_BOSS' && userRole !== 'boss' && userRole !== 'BOSS') {
                     alert('권한이 없습니다.');
                     window.location.href = '/notice';
                     return;
@@ -219,7 +217,7 @@
 
                     // BOSS만 수정/삭제 버튼 표시
                     const userRole = localStorage.getItem('userRole');
-                    if (userRole === 'ROLE_BOSS') {
+                    if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
                         document.getElementById('btnEditMode').style.display = 'inline-block';
                         document.getElementById('btnDeleteNotice').style.display = 'inline-block';
                     }

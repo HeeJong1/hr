@@ -13,41 +13,42 @@
         <result property="name" column="name"/>
         <result property="role" column="role"/>
         <result property="birthdate" column="birthdate"/>
+        <result property="phone" column="phone"/>
         <result property="annualSalary" column="annual_salary"/>
     </resultMap>
 
     <!-- 이메일로 사용자 조회 -->
     <select id="findByEmail" parameterType="string" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
+        SELECT member_no, id, email, password, name, role, birthdate, phone, annual_salary
         FROM member
         WHERE email = #{email}
     </select>
 
     <!-- ID로 사용자 조회 -->
     <select id="findById" parameterType="string" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
+        SELECT member_no, id, email, password, name, role, birthdate, phone, annual_salary
         FROM member
         WHERE id = #{id}
     </select>
 
     <!-- 회원번호로 사용자 조회 -->
     <select id="findByMemberNo" parameterType="long" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
+        SELECT member_no, id, email, password, name, role, birthdate, phone, annual_salary
         FROM member
         WHERE member_no = #{memberNo}
     </select>
 
     <!-- 로그인 인증 처리 -->
     <select id="authenticate" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
+        SELECT member_no, id, email, password, name, role, birthdate, phone, annual_salary
         FROM member
         WHERE email = #{email}
     </select>
 
     <!-- 회원 가입 -->
     <insert id="insertMember" parameterType="com.heejong.hr.entity.Member">
-        INSERT INTO member (id, email, password, name, role, birthdate, annual_salary)
-        VALUES (#{id}, #{email}, #{password}, #{name}, #{role}, #{birthdate}, #{annualSalary})
+        INSERT INTO member (id, email, password, name, role, birthdate, phone, annual_salary)
+        VALUES (#{id}, #{email}, #{password}, #{name}, #{role}, #{birthdate}, #{phone}, #{annualSalary})
     </insert>
 
     <!-- 회원 탈퇴 -->
@@ -58,7 +59,7 @@
 
     <!-- 모든 회원 조회 (관리자용) -->
     <select id="findAll" resultMap="memberResultMap">
-        SELECT member_no, id, email, password, name, role, birthdate, annual_salary
+        SELECT member_no, id, email, password, name, role, birthdate, phone, annual_salary
         FROM member
         ORDER BY member_no ASC
     </select>
@@ -67,6 +68,50 @@
     <update id="updateAnnualSalary">
         UPDATE member
         SET annual_salary = #{annualSalary}
+        WHERE member_no = #{memberNo}
+    </update>
+
+    <!-- 검색/필터 조건으로 회원 목록 조회 (페이징) -->
+    <select id="findWithPaging" resultMap="memberResultMap">
+        SELECT member_no, id, email, password, name, role, birthdate, phone, annual_salary
+        FROM member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (id LIKE CONCAT('%', #{keyword}, '%') OR name LIKE CONCAT('%', #{keyword}, '%') OR email LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="role != null and role != ''">
+                AND role = #{role}
+            </if>
+        </where>
+        ORDER BY member_no ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 검색/필터 조건에 맞는 회원 수 -->
+    <select id="countBySearch" resultType="int">
+        SELECT COUNT(*)
+        FROM member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (id LIKE CONCAT('%', #{keyword}, '%') OR name LIKE CONCAT('%', #{keyword}, '%') OR email LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="role != null and role != ''">
+                AND role = #{role}
+            </if>
+        </where>
+    </select>
+
+    <!-- 프로필 수정 (이름, 연락처) -->
+    <update id="updateProfile">
+        UPDATE member
+        SET name = #{name}, phone = #{phone}
+        WHERE member_no = #{memberNo}
+    </update>
+
+    <!-- 비밀번호 변경 -->
+    <update id="updatePassword">
+        UPDATE member
+        SET password = #{password}
         WHERE member_no = #{memberNo}
     </update>
 

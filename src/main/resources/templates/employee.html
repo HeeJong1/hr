@@ -6,211 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>직원관리</title>
     <link rel="stylesheet" href="/css/layout.css">
-    <style>
-        .employeeCard {
-            background-color: #f5f5f5;
-            border-radius: clamp(8px, 2vw, 12px);
-            padding: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .employeeCard h3 {
-            color: #333;
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .statsRow {
-            display: flex;
-            gap: clamp(1rem, 2vw, 1.5rem);
-            margin-bottom: clamp(1.5rem, 3vw, 2rem);
-            flex-wrap: wrap;
-        }
-
-        .statBox {
-            flex: 1;
-            min-width: clamp(120px, 25vw, 150px);
-            background-color: white;
-            padding: clamp(1rem, 2vw, 1.5rem);
-            border-radius: clamp(6px, 1vw, 8px);
-            border-left: 4px solid #3498db;
-        }
-
-        .statLabel {
-            color: #7f8c8d;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-            margin-bottom: 0.5rem;
-        }
-
-        .statValue {
-            color: #2c3e50;
-            font-size: clamp(1.5rem, 4vw, 2rem);
-            font-weight: bold;
-        }
-
-        .employeeTable {
-            width: 100%;
-            background-color: white;
-            border-radius: clamp(6px, 1vw, 8px);
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .employeeTable table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .employeeTable th,
-        .employeeTable td {
-            padding: clamp(0.75rem, 2vw, 1rem);
-            text-align: left;
-            border-bottom: 1px solid #ecf0f1;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-        }
-
-        .employeeTable th {
-            background-color: #34495e;
-            color: white;
-            font-weight: 600;
-        }
-
-        .employeeTable tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .roleBadge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: clamp(0.75rem, 2vw, 0.85rem);
-            font-weight: 600;
-        }
-
-        .roleBadge.boss {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .roleBadge.user {
-            background-color: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .btnEditSalary {
-            padding: 0.4rem 0.8rem;
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: clamp(0.75rem, 2vw, 0.85rem);
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btnEditSalary:hover {
-            background-color: #2563eb;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modalContent {
-            background-color: white;
-            margin: 5% auto;
-            padding: clamp(1.5rem, 3vw, 2rem);
-            border-radius: clamp(8px, 1vw, 12px);
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            position: absolute;
-            right: clamp(1rem, 2vw, 1.5rem);
-            top: clamp(1rem, 2vw, 1.5rem);
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-        }
-
-        .formGroup {
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-        }
-
-        .formGroup label {
-            display: block;
-            font-size: clamp(0.875rem, 1.5vw, 1rem);
-            color: #374151;
-            margin-bottom: clamp(0.5rem, 1vw, 0.75rem);
-            font-weight: 500;
-        }
-
-        .formGroup input {
-            width: 100%;
-            padding: clamp(0.5rem, 1vw, 0.75rem);
-            border: 1px solid #d1d5db;
-            border-radius: clamp(6px, 1vw, 8px);
-            font-size: clamp(0.875rem, 1.5vw, 1rem);
-            box-sizing: border-box;
-        }
-
-        .formGroup small {
-            display: block;
-            margin-top: clamp(0.25rem, 0.5vw, 0.5rem);
-            color: #6b7280;
-            font-size: clamp(0.75rem, 1.2vw, 0.875rem);
-        }
-
-        .formActions {
-            display: flex;
-            gap: clamp(0.5rem, 1vw, 0.75rem);
-            justify-content: flex-end;
-            margin-top: clamp(1.5rem, 3vw, 2rem);
-        }
-
-        .btnSave {
-            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: clamp(6px, 1vw, 8px);
-            font-size: clamp(0.875rem, 1.5vw, 1rem);
-            cursor: pointer;
-        }
-
-        .btnCancel {
-            padding: clamp(0.5rem, 1vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
-            background: #6b7280;
-            color: white;
-            border: none;
-            border-radius: clamp(6px, 1vw, 8px);
-            font-size: clamp(0.875rem, 1.5vw, 1rem);
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .employeeTable {
-                overflow-x: auto;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/employee.css">
 </head>
 
 <body>
@@ -225,6 +21,9 @@
             </div>
             <nav class="sidebarMenu">
                 <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/boss/dashboard" class="menuItem bossOnly">👔 출근 현황</a>
+                <a href="/attendance/statistics" class="menuItem">📈 출근 통계</a>
+                <a href="/statistics" class="menuItem">📊 통계</a>
                 <a href="/notice" class="menuItem">📢 공지사항</a>
                 <a href="/leave" class="menuItem">📅 연차관리</a>
                 <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
@@ -236,14 +35,12 @@
         </aside>
 
         <!-- 메인 컨텐츠 -->
-        <div class="mainContent">
+        <div class="mainContent employeePage">
             <!-- 헤더 -->
             <header class="header">
                 <h1>직원관리</h1>
                 <div class="userInfo">
-                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
-                        <span id="userName">관리자</span>
-                    </a>
+                    <a href="/mypage" class="headerUserLink"><span id="userName">관리자</span></a>
                     <button class="btnLogout" onclick="logout()">로그아웃</button>
                 </div>
             </header>
@@ -269,38 +66,55 @@
                     </div>
                 </div>
 
-                <!-- 직원 목록 -->
-                <div class="employeeCard">
-                    <h3>직원 목록</h3>
-                    <div class="employeeTable">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>번호</th>
-                                    <th>아이디</th>
-                                    <th>이름</th>
-                                    <th>이메일</th>
-                                    <th>생년월일</th>
-                                    <th>나이</th>
-                                    <th>직급</th>
-                                    <th>연봉</th>
-                                    <th>작업</th>
-                                </tr>
-                            </thead>
-                            <tbody id="employeeListBody">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; padding: 2rem; color: #999;">
-                                        직원 정보를 불러오는 중...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- 테이블 영역 한쪽에 묶어서 표시 -->
+                <div class="employeeTableBlock">
+                    <div class="employeeCard employeeFilterCard">
+                        <div class="employeeFilterRow">
+                            <input type="text" id="searchKeyword" class="searchInput" placeholder="아이디/이름/이메일 검색">
+                            <select id="filterRole" class="roleSelect">
+                                <option value="">전체 직급</option>
+                                <option value="ROLE_USER">USER</option>
+                                <option value="ROLE_BOSS">BOSS</option>
+                            </select>
+                            <button type="button" class="btnSearch" onclick="loadEmployees(1)">검색</button>
+                            <button type="button" class="btnExcelDownload" onclick="downloadExcel()">엑셀 다운로드</button>
+                            <label class="excelUploadLabel">
+                                <span class="excelUploadSpan">엑셀 일괄 등록</span>
+                                <input type="file" id="excelFileInput" class="excelFileInput" accept=".xlsx,.xls">
+                            </label>
+                        </div>
+                        <div id="paginationBar" class="paginationBar"></div>
+                    </div>
+                    <div class="employeeCard employeeTableCard">
+                        <h3>직원 목록</h3>
+                        <div class="employeeTable">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>번호</th>
+                                        <th>아이디</th>
+                                        <th>이름</th>
+                                        <th>이메일</th>
+                                        <th>생년월일</th>
+                                        <th>나이</th>
+                                        <th>직급</th>
+                                        <th>연봉</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeeListBody">
+                                    <tr>
+                                        <td colspan="9" class="loadingCell">직원 정보를 불러오는 중...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>
 
             <!-- 연봉 수정 모달 -->
-            <div id="editSalaryModal" class="modal" style="display: none;">
+            <div id="editSalaryModal" class="employeeModal">
                 <div class="modalContent">
                     <span class="close" onclick="closeEditSalaryModal()">&times;</span>
                     <h2>연봉 수정</h2>
@@ -377,60 +191,64 @@
                 });
             }
 
-            // 직원 목록 로드
-            await loadEmployees();
+            // 직원 목록 로드 (페이징)
+            await loadEmployees(1);
         });
 
-        // 직원 목록 로드
-        async function loadEmployees() {
+        let currentPage = 1;
+        const pageSize = 10;
+
+        async function loadEmployees(page) {
+            if (page) currentPage = page;
             try {
-                const response = await fetch('/api/employees');
+                const keyword = document.getElementById('searchKeyword').value.trim();
+                const role = document.getElementById('filterRole').value;
+                const url = `/api/employees?page=${currentPage}&size=${pageSize}&keyword=${encodeURIComponent(keyword)}&role=${encodeURIComponent(role || '')}`;
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (response.ok) {
                     const employees = data.employees || [];
+                    const totalCount = data.totalCount !== undefined ? data.totalCount : employees.length;
+                    const totalPages = data.totalPages || 1;
 
-                    // 통계 업데이트
-                    const bossCount = employees.filter(emp => emp.role === 'ROLE_BOSS').length;
-                    const userCount = employees.filter(emp => emp.role === 'ROLE_USER').length;
+                    // 통계는 전체 기준으로 별도 조회 (1페이지만)
+                    if (currentPage === 1) {
+                        const statRes = await fetch('/api/employees');
+                        const statData = await statRes.json();
+                        if (statRes.ok && statData.employees) {
+                            const all = statData.employees;
+                            document.getElementById('totalEmployees').textContent = all.length + '명';
+                            document.getElementById('bossCount').textContent = all.filter(e => e.role === 'ROLE_BOSS').length + '명';
+                            document.getElementById('userCount').textContent = all.filter(e => e.role === 'ROLE_USER').length + '명';
+                        }
+                    }
 
-                    document.getElementById('totalEmployees').textContent = employees.length + '명';
-                    document.getElementById('bossCount').textContent = bossCount + '명';
-                    document.getElementById('userCount').textContent = userCount + '명';
-
-                    // 직원 목록 표시
                     const tbody = document.getElementById('employeeListBody');
                     if (employees.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem;">등록된 직원이 없습니다.</td></tr>';
+                        renderPagination(0, 1);
                         return;
                     }
 
-                    // 연봉 정보 로드
                     const employeesWithSalary = await Promise.all(employees.map(async (emp) => {
                         try {
-                            const token = localStorage.getItem('token');
-                            const salaryResponse = await fetch(`/api/employees/${emp.memberNo}/annual-salary`, {
-                                headers: {
-                                    'Authorization': `Bearer ${token}`
-                                }
-                            });
+                            const salaryResponse = await fetch(`/api/employees/${emp.memberNo}/annual-salary`);
                             if (salaryResponse.ok) {
                                 const salaryData = await salaryResponse.json();
                                 emp.annualSalary = salaryData.annualSalary;
                             }
-                        } catch (e) {
-                            console.error('Error loading salary:', e);
-                        }
+                        } catch (e) { }
                         return emp;
                     }));
 
                     tbody.innerHTML = employeesWithSalary.map(emp => {
                         const roleBadgeClass = emp.role === 'ROLE_BOSS' ? 'boss' : 'user';
                         const roleText = emp.role === 'ROLE_BOSS' ? 'BOSS' : 'USER';
-                        const age = emp.age !== null ? emp.age + '세' : '-';
+                        const age = emp.age != null ? emp.age + '세' : '-';
                         const birthdate = emp.birthdate || '-';
                         const annualSalary = emp.annualSalary ? parseInt(emp.annualSalary).toLocaleString() + '만원' : '미등록';
-
+                        const nameEsc = (emp.name || '').replace(/'/g, "\\'");
                         return `
                             <tr>
                                 <td>${emp.memberNo}</td>
@@ -442,13 +260,13 @@
                                 <td><span class="roleBadge ${roleBadgeClass}">${roleText}</span></td>
                                 <td>${annualSalary}</td>
                                 <td>
-                                    <button class="btnEditSalary" onclick="showEditSalaryModal(${emp.memberNo}, '${emp.name}', '${emp.annualSalary || ''}')">
-                                        연봉 수정
-                                    </button>
+                                    <button class="btnEditSalary" onclick="showEditSalaryModal(${emp.memberNo}, '${nameEsc}', '${(emp.annualSalary || '').toString().replace(/'/g, "\\'")}')">연봉 수정</button>
                                 </td>
                             </tr>
                         `;
                     }).join('');
+
+                    renderPagination(totalCount, totalPages);
                 } else {
                     alert('직원 목록을 불러오는데 실패했습니다.');
                 }
@@ -457,6 +275,47 @@
                 alert('서버 연결에 실패했습니다.');
             }
         }
+
+        function renderPagination(totalCount, totalPages) {
+            const bar = document.getElementById('paginationBar');
+            if (totalPages <= 1) {
+                bar.innerHTML = totalCount > 0 ? `<span>총 ${totalCount}명</span>` : '';
+                return;
+            }
+            bar.innerHTML = `
+                <button type="button" ${currentPage <= 1 ? 'disabled' : ''} onclick="loadEmployees(${currentPage - 1})">이전</button>
+                <span>${currentPage} / ${totalPages} (총 ${totalCount}명)</span>
+                <button type="button" ${currentPage >= totalPages ? 'disabled' : ''} onclick="loadEmployees(${currentPage + 1})">다음</button>
+            `;
+        }
+
+        function downloadExcel() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            const role = document.getElementById('filterRole').value;
+            let url = '/api/employees/export/excel';
+            if (keyword || role) url += '?keyword=' + encodeURIComponent(keyword) + '&role=' + encodeURIComponent(role || '');
+            window.location.href = url;
+        }
+
+        document.getElementById('excelFileInput').addEventListener('change', async function() {
+            const file = this.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch('/api/employees/import/excel', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(data.message || '일괄 등록 완료');
+                    this.value = '';
+                    loadEmployees(1);
+                } else {
+                    alert(data.message || '등록 실패');
+                }
+            } catch (e) {
+                alert('서버 연결에 실패했습니다.');
+            }
+        });
 
         let currentEditMemberNo = null;
 

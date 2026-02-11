@@ -160,4 +160,14 @@
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
+    <insert id="insertNoticeRead">
+        INSERT INTO notice_read (member_no, notice_no)
+        VALUES (#{memberNo}, #{noticeNo})
+        ON CONFLICT (member_no, notice_no) DO NOTHING
+    </insert>
+
+    <select id="findReadNoticeNosByMember" resultType="long">
+        SELECT notice_no FROM notice_read WHERE member_no = #{memberNo}
+    </select>
+
 </mapper>

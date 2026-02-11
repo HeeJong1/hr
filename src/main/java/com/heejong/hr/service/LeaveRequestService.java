@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class LeaveRequestService {
 
     private final LeaveRequestMapper leaveRequestMapper;
+    private final NotificationService notificationService;
 
     /**
      * 연차 신청
@@ -76,6 +77,10 @@ public class LeaveRequestService {
      * 연차 신청 승인
      */
     public void approveLeaveRequest(Long leaveRequestNo, String comment) {
+        LeaveRequest existing = leaveRequestMapper.findByLeaveRequestNo(leaveRequestNo);
+        if (existing == null) {
+            throw new IllegalArgumentException("존재하지 않는 연차 신청입니다");
+        }
         LeaveRequest leaveRequest = new LeaveRequest();
         leaveRequest.setLeaveRequestNo(leaveRequestNo);
         leaveRequest.setStatus("approved");
@@ -87,12 +92,18 @@ public class LeaveRequestService {
         if (result == 0) {
             throw new RuntimeException("연차 승인에 실패했습니다");
         }
+        notificationService.create(existing.getMemberNo(), "LEAVE_APPROVED", "연차 승인",
+                "연차 신청이 승인되었습니다.", String.valueOf(leaveRequestNo));
     }
 
     /**
      * 연차 신청 반려
      */
     public void rejectLeaveRequest(Long leaveRequestNo, String comment) {
+        LeaveRequest existing = leaveRequestMapper.findByLeaveRequestNo(leaveRequestNo);
+        if (existing == null) {
+            throw new IllegalArgumentException("존재하지 않는 연차 신청입니다");
+        }
         LeaveRequest leaveRequest = new LeaveRequest();
         leaveRequest.setLeaveRequestNo(leaveRequestNo);
         leaveRequest.setStatus("rejected");
@@ -104,6 +115,8 @@ public class LeaveRequestService {
         if (result == 0) {
             throw new RuntimeException("연차 반려에 실패했습니다");
         }
+        notificationService.create(existing.getMemberNo(), "LEAVE_REJECTED", "연차 반려",
+                "연차 신청이 반려되었습니다.", String.valueOf(leaveRequestNo));
     }
 
     /**

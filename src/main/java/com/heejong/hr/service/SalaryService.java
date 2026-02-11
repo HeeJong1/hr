@@ -21,6 +21,7 @@ public class SalaryService {
 
     private final SalaryMapper salaryMapper;
     private final EmployeeService employeeService;
+    private final NotificationService notificationService;
 
     // ========== 급여 정보 관리 ==========
 
@@ -133,6 +134,9 @@ public class SalaryService {
         payment.setStatus("PENDING");
 
         salaryMapper.insertSalaryPayment(payment);
+
+        notificationService.create(memberNo, "SALARY_PAID", "급여 지급",
+                year + "년 " + month + "월 급여가 지급되었습니다.", year + "-" + month);
 
         return salaryMapper.findPaymentByMemberAndMonth(memberNo, year, month);
     }

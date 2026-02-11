@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대시보드</title>
     <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/home.css">
 </head>
 
 <body>
@@ -22,6 +23,7 @@
                 <a href="/home" class="menuItem active">📊 대시보드</a>
                 <a href="/boss/dashboard" class="menuItem bossOnly">👔 출근 현황</a>
                 <a href="/attendance/statistics" class="menuItem">📈 출근 통계</a>
+                <a href="/statistics" class="menuItem">📊 통계</a>
                 <a href="/notice" class="menuItem">📢 공지사항</a>
                 <a href="/leave" class="menuItem">📅 연차관리</a>
                 <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
@@ -48,10 +50,30 @@
 
             <!-- 컨텐츠 -->
             <main class="content">
-                <div
-                    style="background-color: #f5f5f5; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h2 style="color: #333; margin-bottom: 1rem;">환영합니다!</h2>
-                    <p style="color: #666; line-height: 1.6;">HR 관리 시스템에 오신 것을 환영합니다. 왼쪽 메뉴를 통해 다양한 기능을 이용하실 수 있습니다.</p>
+                <!-- 대시보드 요약 위젯 -->
+                <div class="dashboardWidgets">
+                    <div class="widgetCard widgetBlue">
+                        <div class="widgetLabel">전체 직원</div>
+                        <div id="widgetEmployeeCount" class="widgetValue">-</div>
+                    </div>
+                    <div class="widgetCard widgetGreen">
+                        <div class="widgetLabel">오늘 출근률</div>
+                        <div id="widgetAttendanceRate" class="widgetValue">-</div>
+                    </div>
+                    <div class="widgetCard widgetOrange">
+                        <div class="widgetLabel">미결재 휴가</div>
+                        <div id="widgetPendingLeave" class="widgetValue">-</div>
+                    </div>
+                </div>
+                <div class="welcomeCard">
+                    <h2>환영합니다!</h2>
+                    <p>HR 관리 시스템에 오신 것을 환영합니다. 왼쪽 메뉴를 통해 다양한 기능을 이용하실 수 있습니다.</p>
+                </div>
+                <div class="recentNoticesCard">
+                    <h3>최근 공지</h3>
+                    <ul id="recentNoticesList" class="recentNoticesList">
+                        <li class="loading">불러오는 중...</li>
+                    </ul>
                 </div>
             </main>
 
@@ -113,7 +135,33 @@
                     item.classList.add('show');
                 });
             }
+            loadDashboardSummary();
         });
+
+        async function loadDashboardSummary() {
+            try {
+                const res = await fetch('/api/dashboard/summary');
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('widgetEmployeeCount').textContent = (data.employeeCount || 0) + '명';
+                    document.getElementById('widgetAttendanceRate').textContent = (data.todayAttendanceRate ?? 0) + '%';
+                    document.getElementById('widgetPendingLeave').textContent = (data.pendingLeaveCount || 0) + '건';
+                    const notices = data.recentNotices || [];
+                    const ul = document.getElementById('recentNoticesList');
+                    if (notices.length === 0) {
+                        ul.innerHTML = '<li style="color: #999;">등록된 공지가 없습니다.</li>';
+                    } else {
+                        ul.innerHTML = notices.map(n => `
+                            <li style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                                <a href="/noticeWrite?noticeNo=${n.noticeNo}&mode=view" style="color: #3498db; text-decoration: none;">${n.isImportant ? '📌 ' : ''}${n.title}</a>
+                            </li>
+                        `).join('');
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
     </script>
 </body>
 

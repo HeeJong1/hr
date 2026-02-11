@@ -23,6 +23,7 @@ public class Member implements UserDetails {
     private String name;
     private String role;
     private LocalDate birthdate; // 생년월일
+    private String phone;        // 연락처
     private String annualSalary; // 연봉 (암호화된 값)
 
     // 나이 계산

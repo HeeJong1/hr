@@ -1,7 +1,10 @@
 package com.heejong.hr.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -15,15 +18,131 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.heejong.hr.entity.LeaveRequest;
+import com.heejong.hr.entity.Member;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ExcelService {
+
+    /**
+     * 직원 목록을 엑셀 파일로 변환
+     */
+    public byte[] exportEmployeesToExcel(List<Member> members) throws Exception {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("직원 목록");
+
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+
+        Row headerRow = sheet.createRow(0);
+        String[] columns = {"회원번호", "아이디", "이메일", "이름", "직급", "생년월일", "연락처"};
+        for (int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        int rowNum = 1;
+        for (Member m : members) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(m.getMemberNo() != null ? m.getMemberNo() : 0);
+            row.createCell(1).setCellValue(m.getId() != null ? m.getId() : "");
+            row.createCell(2).setCellValue(m.getEmail() != null ? m.getEmail() : "");
+            row.createCell(3).setCellValue(m.getName() != null ? m.getName() : "");
+            row.createCell(4).setCellValue(m.getRole() != null ? m.getRole() : "");
+            row.createCell(5).setCellValue(m.getBirthdate() != null ? m.getBirthdate().format(dateFormatter) : "");
+            row.createCell(6).setCellValue(m.getPhone() != null ? m.getPhone() : "");
+            for (int i = 0; i < columns.length; i++) {
+                row.getCell(i).setCellStyle(cellStyle);
+            }
+        }
+
+        for (int i = 0; i < columns.length; i++) {
+            sheet.autoSizeColumn(i);
+            sheet.setColumnWidth(i, Math.min(sheet.getColumnWidth(i) + 1024, 15000));
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        return outputStream.toByteArray();
+    }
+
+    /**
+     * 엑셀 파일에서 직원 목록 파싱 (헤더: 아이디, 이메일, 이름, 직급, 생년월일, 연락처)
+     * 비밀번호는 기본값 "password1!" 로 암호화하여 설정
+     */
+    public List<Member> parseEmployeesFromExcel(InputStream inputStream) throws Exception {
+        List<Member> list = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        if (sheet == null) {
+            workbook.close();
+            return list;
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String defaultPassword = encoder.encode("password1!");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) continue;
+            String id = getCellString(row.getCell(1));
+            String email = getCellString(row.getCell(2));
+            String name = getCellString(row.getCell(3));
+            if (id == null || id.trim().isEmpty()) continue;
+            Member m = new Member();
+            m.setId(id.trim());
+            m.setEmail(email != null && !email.trim().isEmpty() ? email.trim() : id.trim() + "@hr.local");
+            m.setName(name != null ? name.trim() : id.trim());
+            m.setPassword(defaultPassword);
+            String role = getCellString(row.getCell(4));
+            m.setRole(role != null && role.contains("BOSS") ? "ROLE_BOSS" : "ROLE_USER");
+            String birthStr = getCellString(row.getCell(5));
+            if (birthStr != null && !birthStr.trim().isEmpty()) {
+                try {
+                    m.setBirthdate(LocalDate.parse(birthStr.trim()));
+                } catch (Exception ignored) {}
+            }
+            String phone = getCellString(row.getCell(6));
+            m.setPhone(phone != null ? phone.trim() : null);
+            list.add(m);
+        }
+        workbook.close();
+        return list;
+    }
+
+    private static String getCellString(org.apache.poi.ss.usermodel.Cell cell) {
+        if (cell == null) return null;
+        switch (cell.getCellType()) {
+            case STRING: return cell.getStringCellValue();
+            case NUMERIC: return String.valueOf((long) cell.getNumericCellValue());
+            case BOOLEAN: return String.valueOf(cell.getBooleanCellValue());
+            default: return null;
+        }
+    }
 
     /**
      * 연차 신청 내역을 엑셀 파일로 변환

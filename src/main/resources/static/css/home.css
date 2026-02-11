@@ -169,3 +169,80 @@
         width: 100%;
     }
 }
+
+/* 대시보드 요약 위젯 (home 페이지) */
+.dashboardWidgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.widgetCard {
+    color: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.widgetCard.widgetBlue {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.widgetCard.widgetGreen {
+    background: linear-gradient(135deg, #27ae60, #219a52);
+}
+
+.widgetCard.widgetOrange {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.widgetCard .widgetLabel {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.widgetCard .widgetValue {
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.welcomeCard {
+    background-color: #f5f5f5;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.welcomeCard h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.welcomeCard p {
+    color: #666;
+    line-height: 1.6;
+}
+
+.recentNoticesCard {
+    background-color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recentNoticesCard h3 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.recentNoticesList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recentNoticesList .loading {
+    color: #999;
+}

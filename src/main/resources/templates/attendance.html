@@ -6,177 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>출퇴근 관리</title>
     <link rel="stylesheet" href="/css/layout.css">
-    <style>
-        .attendanceSection .contentCard {
-            background: white;
-            border-radius: clamp(8px, 1vw, 12px);
-            padding: clamp(1rem, 3vw, 1.5rem);
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .attendanceSection .todayCard {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-align: center;
-            padding: clamp(1.5rem, 4vw, 2.5rem);
-        }
-
-        .attendanceSection .todayCard h2 {
-            margin: 0 0 clamp(0.5rem, 1vw, 1rem) 0;
-            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-        }
-
-        .attendanceSection .currentTime {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: bold;
-            margin: clamp(0.5rem, 1vw, 1rem) 0;
-        }
-
-        .attendanceSection .currentDate {
-            font-size: clamp(1rem, 2vw, 1.2rem);
-            opacity: 0.9;
-        }
-
-        .attendanceSection .attendanceButtons {
-            display: flex;
-            gap: clamp(0.8rem, 2vw, 1rem);
-            margin-top: clamp(1rem, 2vw, 1.5rem);
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .attendanceSection .btnAttendance {
-            padding: clamp(0.8rem, 2vw, 1rem) clamp(2rem, 4vw, 3rem);
-            font-size: clamp(1rem, 2vw, 1.2rem);
-            font-weight: 600;
-            border: none;
-            border-radius: clamp(6px, 1vw, 8px);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .attendanceSection .btnCheckIn {
-            background: white;
-            color: #667eea;
-        }
-
-        .attendanceSection .btnCheckIn:hover {
-            background: #f0f0f0;
-            transform: translateY(-2px);
-        }
-
-        .attendanceSection .btnCheckOut {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid white;
-        }
-
-        .attendanceSection .btnCheckOut:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .attendanceSection .statusBadge {
-            display: inline-block;
-            padding: clamp(0.3rem, 1vw, 0.4rem) clamp(0.6rem, 2vw, 0.8rem);
-            border-radius: clamp(4px, 1vw, 6px);
-            font-size: clamp(0.75rem, 1.5vw, 0.85rem);
-            font-weight: 600;
-        }
-
-        .attendanceSection .statusNormal {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .attendanceSection .statusLate {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .attendanceSection .statusEarlyLeave {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .attendanceSection .statusAbsent {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .attendanceSection .statsGrid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: clamp(0.8rem, 2vw, 1rem);
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-        }
-
-        .attendanceSection .statCard {
-            background: white;
-            border-radius: clamp(6px, 1vw, 8px);
-            padding: clamp(1rem, 2vw, 1.2rem);
-            text-align: center;
-            border: 1px solid #e0e0e0;
-        }
-
-        .attendanceSection .statCard h3 {
-            margin: 0 0 clamp(0.3rem, 1vw, 0.5rem) 0;
-            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
-            color: #666;
-        }
-
-        .attendanceSection .statCard .statValue {
-            font-size: clamp(1.5rem, 3vw, 2rem);
-            font-weight: bold;
-            color: #333;
-        }
-
-        .attendanceSection .attendanceTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: clamp(0.8rem, 2vw, 1rem);
-        }
-
-        .attendanceSection .attendanceTable th,
-        .attendanceSection .attendanceTable td {
-            padding: clamp(0.6rem, 2vw, 0.8rem);
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: clamp(0.85rem, 1.5vw, 0.95rem);
-        }
-
-        .attendanceSection .attendanceTable th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .attendanceSection .attendanceTable tr:hover {
-            background: #f8f9fa;
-        }
-
-        .attendanceSection .noData {
-            text-align: center;
-            padding: clamp(2rem, 4vw, 3rem);
-            color: #999;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-        }
-
-        @media (max-width: 768px) {
-            .attendanceSection .attendanceTable {
-                font-size: clamp(0.75rem, 2vw, 0.85rem);
-            }
-
-            .attendanceSection .attendanceTable th,
-            .attendanceSection .attendanceTable td {
-                padding: clamp(0.5rem, 1.5vw, 0.6rem);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/attendance.css">
 </head>
 
-<body>
+<body class="attendancePage">
     <section class="layoutSection">
         <!-- 모바일 메뉴 토글 -->
         <button class="menuToggle" onclick="toggleSidebar()">☰</button>
@@ -205,9 +38,7 @@
             <header class="header">
                 <h1>출퇴근 관리</h1>
                 <div class="userInfo">
-                    <a href="/mypage" style="color: #555; text-decoration: none; font-size: clamp(0.9rem, 2vw, 1rem);">
-                        <span id="userName">사용자</span>
-                    </a>
+                    <a href="/mypage" class="headerUserLink"><span id="userName">사용자</span></a>
                     <button class="btnLogout" onclick="logout()">로그아웃</button>
                 </div>
             </header>
@@ -220,7 +51,7 @@
                     <div class="currentDate" id="currentDate">2024년 1월 20일 화요일</div>
                     <div class="currentTime" id="currentTime">00:00:00</div>
 
-                    <div id="todayStatus" style="margin-top: 1rem; font-size: clamp(1rem, 2vw, 1.2rem);">
+                    <div id="todayStatus" class="todayStatus">
                         <!-- 동적으로 채워질 내용 -->
                     </div>
 
@@ -232,8 +63,7 @@
 
                 <!-- 이번 달 통계 -->
                 <div class="contentCard">
-                    <h2 style="margin: 0 0 clamp(1rem, 2vw, 1.5rem) 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">이번 달 근무
-                        통계</h2>
+                    <h2>이번 달 근무 통계</h2>
                     <div class="statsGrid">
                         <div class="statCard">
                             <h3>총 근무시간</h3>
@@ -256,8 +86,7 @@
 
                 <!-- 최근 출퇴근 내역 -->
                 <div class="contentCard">
-                    <h2 style="margin: 0 0 clamp(0.5rem, 1vw, 1rem) 0; font-size: clamp(1.1rem, 2vw, 1.3rem);">최근 출퇴근 내역
-                    </h2>
+                    <h2>최근 출퇴근 내역</h2>
                     <table class="attendanceTable">
                         <thead>
                             <tr>
@@ -289,6 +118,13 @@
         let userName = null;
         let userRole = null;
 
+        function applyBossMenuVisibility() {
+            const r = localStorage.getItem('userRole');
+            if (r === 'boss' || r === 'ROLE_BOSS' || r === 'BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => item.classList.add('show'));
+            }
+        }
+
         // 페이지 로드 시 실행
         window.onload = async function () {
             // 로그인 확인
@@ -306,11 +142,7 @@
             document.getElementById('userName').textContent = userName;
 
             // BOSS 메뉴 표시
-            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
-                document.querySelectorAll('.bossOnly').forEach(item => {
-                    item.classList.add('show');
-                });
-            }
+            applyBossMenuVisibility();
 
             // 현재 시간 업데이트
             updateCurrentTime();

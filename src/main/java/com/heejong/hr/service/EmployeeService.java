@@ -1,6 +1,8 @@
 package com.heejong.hr.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,60 @@ public class EmployeeService {
 
     private final LoginMapper loginMapper;
     private final EncryptionUtil encryptionUtil;
+    private final ExcelService excelService;
 
     /**
      * 모든 직원 조회
      */
     public List<Member> getAllEmployees() {
         return loginMapper.findAll();
+    }
+
+    /**
+     * 검색/필터/페이징으로 직원 목록 조회
+     */
+    public Map<String, Object> getEmployeesPaged(String keyword, String role, int page, int size) {
+        int offset = (page - 1) * size;
+        List<Member> list = loginMapper.findWithPaging(keyword, role, offset, size);
+        int totalCount = loginMapper.countBySearch(keyword, role);
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+        if (totalPages < 1) totalPages = 1;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("employees", list);
+        result.put("totalCount", totalCount);
+        result.put("currentPage", page);
+        result.put("totalPages", totalPages);
+        result.put("size", size);
+        result.put("keyword", keyword);
+        result.put("role", role);
+        return result;
+    }
+
+    /**
+     * 엑셀 파일로 직원 일괄 등록 (기존 ID 있으면 스킵)
+     */
+    @Transactional
+    public Map<String, Object> importEmployeesFromExcel(java.io.InputStream inputStream) throws Exception {
+        List<Member> list = excelService.parseEmployeesFromExcel(inputStream);
+        int inserted = 0, skipped = 0;
+        for (Member m : list) {
+            if (loginMapper.findById(m.getId()) != null) {
+                skipped++;
+                continue;
+            }
+            if (loginMapper.findByEmail(m.getEmail()) != null) {
+                skipped++;
+                continue;
+            }
+            loginMapper.insertMember(m);
+            inserted++;
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("insertedCount", inserted);
+        result.put("skippedCount", skipped);
+        result.put("totalRows", list.size());
+        return result;
     }
 
     /**

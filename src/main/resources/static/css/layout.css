@@ -74,7 +74,7 @@
 }
 
 .menuItem.bossOnly.show {
-    display: flex;
+    display: flex !important;
 }
 
 /* 메인 컨텐츠 */

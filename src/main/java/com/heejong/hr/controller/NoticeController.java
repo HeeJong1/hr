@@ -170,14 +170,15 @@ public class NoticeController {
     }
 
     /**
-     * 페이징 처리된 공지사항 조회
+     * 페이징 처리된 공지사항 조회 (memberNo 있으면 읽음 목록 포함)
      */
     @GetMapping("/page")
     public ResponseEntity<Map<String, Object>> getNoticesWithPaging(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long memberNo) {
         try {
-            Map<String, Object> result = noticeService.getNoticesWithPaging(page, size);
+            Map<String, Object> result = noticeService.getNoticesWithPaging(page, size, memberNo);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
@@ -188,20 +189,46 @@ public class NoticeController {
     }
 
     /**
-     * 페이징 처리된 검색 결과
+     * 페이징 처리된 검색 결과 (memberNo 있으면 읽음 목록 포함)
      */
     @GetMapping("/page/search")
     public ResponseEntity<Map<String, Object>> searchNoticesWithPaging(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long memberNo) {
         try {
-            Map<String, Object> result = noticeService.searchNoticesWithPaging(keyword, page, size);
+            Map<String, Object> result = noticeService.searchNoticesWithPaging(keyword, page, size, memberNo);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "서버 오류가 발생했습니다: " + e.getMessage());
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * 공지 읽음 처리
+     */
+    @PostMapping("/{noticeNo}/read")
+    public ResponseEntity<Map<String, String>> markAsRead(
+            @PathVariable Long noticeNo,
+            @RequestBody Map<String, Object> body) {
+        try {
+            Long memberNo = body.get("memberNo") != null ? Long.valueOf(body.get("memberNo").toString()) : null;
+            if (memberNo == null) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "회원 정보가 필요합니다.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            noticeService.markAsRead(memberNo, noticeNo);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "읽음 처리되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "서버 오류: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

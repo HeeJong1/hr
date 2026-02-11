@@ -142,10 +142,8 @@
             document.getElementById('userName').textContent = userName;
 
             // BOSS 메뉴 및 작성 버튼 표시
-            if (userRole === 'ROLE_BOSS') {
-                document.querySelectorAll('.bossOnly').forEach(item => {
-                    item.classList.add('show');
-                });
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => item.classList.add('show'));
                 document.getElementById('btnWrite').style.display = 'inline-block';
             }
 
@@ -153,10 +151,13 @@
             await loadNotices(1);
         });
 
-        // 공지사항 목록 로드 (페이징)
+        // 공지사항 목록 로드 (페이징, 읽음 표시용 memberNo)
         async function loadNotices(page) {
+            const memberNo = localStorage.getItem('memberNo');
+            let url = `/api/notice/page?page=${page}&size=${pageSize}`;
+            if (memberNo) url += '&memberNo=' + memberNo;
             try {
-                const response = await fetch(`/api/notice/page?page=${page}&size=${pageSize}`);
+                const response = await fetch(url);
                 const data = await response.json();
 
                 if (response.ok) {
@@ -164,7 +165,7 @@
                     totalPages = data.totalPages;
                     totalCount = data.totalCount;
                     currentKeyword = '';
-                    
+                    window.readNoticeNos = data.readNoticeNos || [];
                     displayNotices(data.notices || []);
                     displayPagination();
                 } else {
@@ -185,9 +186,11 @@
                 return;
             }
 
+            const readSet = (window.readNoticeNos || []).reduce((s, n) => { s.add(n); return s; }, new Set());
             tbody.innerHTML = notices.map((notice, index) => {
                 const rowClass = notice.isImportant ? 'important' : '';
                 const importantBadge = notice.isImportant ? '<span class="importantBadge">중요</span>' : '';
+                const readBadge = readSet.has(notice.noticeNo) ? '<span style="color:#27ae60;font-size:0.8rem;">읽음</span>' : '<span style="color:#e74c3c;font-size:0.8rem;">안읽음</span>';
                 const createdDate = new Date(notice.createdAt).toLocaleDateString('ko-KR');
                 const displayNumber = totalCount - ((currentPage - 1) * pageSize) - index;
 
@@ -195,7 +198,7 @@
                     <tr class="${rowClass}" onclick="viewNotice(${notice.noticeNo})">
                         <td>${displayNumber}</td>
                         <td class="noticeTitle">
-                            ${importantBadge}${notice.title}
+                            ${importantBadge} ${readBadge} ${notice.title}
                         </td>
                         <td>${notice.authorName}</td>
                         <td class="viewCount">${notice.viewCount}</td>
@@ -247,9 +250,19 @@
             }
         }
 
-        // 공지사항 상세보기
+        // 공지사항 상세보기 (읽음 처리 후 이동)
         function viewNotice(noticeNo) {
-            window.location.href = `/noticeWrite?noticeNo=${noticeNo}&mode=view`;
+            const memberNo = localStorage.getItem('memberNo');
+            if (memberNo) {
+                fetch(`/api/notice/${noticeNo}/read`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ memberNo: parseInt(memberNo, 10) })
+                }).then(() => { window.location.href = `/noticeWrite?noticeNo=${noticeNo}&mode=view`; })
+                  .catch(() => { window.location.href = `/noticeWrite?noticeNo=${noticeNo}&mode=view`; });
+            } else {
+                window.location.href = `/noticeWrite?noticeNo=${noticeNo}&mode=view`;
+            }
         }
 
         // 검색
@@ -266,20 +279,19 @@
 
         // 검색 (페이징)
         async function searchNoticesWithPage(page, keyword) {
-            if (!keyword) {
-                keyword = currentKeyword;
-            }
-
+            if (!keyword) keyword = currentKeyword;
+            const memberNo = localStorage.getItem('memberNo');
+            let url = `/api/notice/page/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${pageSize}`;
+            if (memberNo) url += '&memberNo=' + memberNo;
             try {
-                const response = await fetch(`/api/notice/page/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${pageSize}`);
+                const response = await fetch(url);
                 const data = await response.json();
-
                 if (response.ok) {
                     currentPage = data.currentPage;
                     totalPages = data.totalPages;
                     totalCount = data.totalCount;
                     currentKeyword = keyword;
-                    
+                    window.readNoticeNos = data.readNoticeNos || [];
                     displayNotices(data.notices || []);
                     displayPagination();
                 } else {

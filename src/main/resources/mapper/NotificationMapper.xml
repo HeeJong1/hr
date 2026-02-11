@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.heejong.hr.mapper.NotificationMapper">
+
+    <resultMap id="notificationResultMap" type="com.heejong.hr.entity.Notification">
+        <id property="notificationNo" column="notification_no"/>
+        <result property="memberNo" column="member_no"/>
+        <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="message" column="message"/>
+        <result property="relatedId" column="related_id"/>
+        <result property="isRead" column="is_read"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.heejong.hr.entity.Notification" useGeneratedKeys="true" keyProperty="notificationNo" keyColumn="notification_no">
+        INSERT INTO notification (member_no, type, title, message, related_id, is_read)
+        VALUES (#{memberNo}, #{type}, #{title}, #{message}, #{relatedId}, false)
+    </insert>
+
+    <select id="findByMemberNo" resultMap="notificationResultMap">
+        SELECT notification_no, member_no, type, title, message, related_id, is_read, created_at
+        FROM notification
+        WHERE (member_no = #{memberNo} OR member_no IS NULL)
+        ORDER BY created_at DESC
+        <if test="limit != null">LIMIT #{limit}</if>
+    </select>
+
+    <select id="countUnreadByMemberNo" resultType="int">
+        SELECT COUNT(*)
+        FROM notification
+        WHERE (member_no = #{memberNo} OR member_no IS NULL) AND (is_read = false OR is_read IS NULL)
+    </select>
+
+    <update id="markAsRead">
+        UPDATE notification SET is_read = true WHERE notification_no = #{notificationNo}
+    </update>
+
+    <update id="markAllAsReadByMemberNo">
+        UPDATE notification SET is_read = true
+        WHERE (member_no = #{memberNo} OR member_no IS NULL)
+    </update>
+
+</mapper>

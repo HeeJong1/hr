@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통계</title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/statistics.css">
+</head>
+
+<body class="statisticsPage">
+    <section class="layoutSection">
+        <button class="menuToggle" onclick="toggleSidebar()">☰</button>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader"><h2>HR 시스템</h2></div>
+            <nav class="sidebarMenu">
+                <a href="/home" class="menuItem">📊 대시보드</a>
+                <a href="/boss/dashboard" class="menuItem bossOnly">👔 출근 현황</a>
+                <a href="/attendance/statistics" class="menuItem">📈 출근 통계</a>
+                <a href="/statistics" class="menuItem active">📊 통계</a>
+                <a href="/notice" class="menuItem">📢 공지사항</a>
+                <a href="/leave" class="menuItem">📅 연차관리</a>
+                <a href="/leaveCalendar" class="menuItem">🗓️ 휴가캘린더</a>
+                <a href="/attendance" class="menuItem">⏰ 출퇴근</a>
+                <a href="/salary" class="menuItem">💰 급여관리</a>
+                <a href="/salary/statement" class="menuItem">💵 월급 내역서</a>
+                <a href="/employee" class="menuItem">👥 직원관리</a>
+                <a href="/admin/leave" class="menuItem bossOnly">⚙️ 연차승인</a>
+            </nav>
+        </aside>
+        <div class="mainContent">
+            <header class="header">
+                <h1>통계</h1>
+                <div class="userInfo">
+                    <a href="/mypage" class="headerUserLink"><span id="userName">사용자</span></a>
+                    <button class="btnLogout" onclick="logout()">로그아웃</button>
+                </div>
+            </header>
+            <main class="content">
+                <div class="statSection">
+                    <h3>📈 출근 통계 요약</h3>
+                    <div class="statGrid" id="attendanceStats">
+                        <div class="statCard"><div class="label">오늘 출근</div><div class="value" id="todayAttended">-</div></div>
+                        <div class="statCard"><div class="label">오늘 출근률</div><div class="value" id="todayRate">-</div></div>
+                        <div class="statCard"><div class="label">전체 직원</div><div class="value" id="totalEmp">-</div></div>
+                    </div>
+                    <div class="linkRow"><a href="/attendance/statistics">상세 출근 통계 →</a><a href="/boss/dashboard">출근 현황 대시보드 →</a></div>
+                </div>
+                <div class="statSection">
+                    <h3>📅 휴가 통계</h3>
+                    <div class="statGrid" id="leaveStats">
+                        <div class="statCard leave-approved"><div class="label">승인</div><div class="value" id="leaveApproved">-</div></div>
+                        <div class="statCard leave-pending"><div class="label">대기</div><div class="value" id="leavePending">-</div></div>
+                        <div class="statCard leave-rejected"><div class="label">반려</div><div class="value" id="leaveRejected">-</div></div>
+                    </div>
+                    <div class="linkRow"><a href="/admin/leave">연차 승인 관리 →</a><a href="/leaveCalendar">휴가 캘린더 →</a></div>
+                </div>
+                <div class="statSection">
+                    <h3>📢 공지 통계</h3>
+                    <div class="statGrid" id="noticeStats">
+                        <div class="statCard notice"><div class="label">전체 공지</div><div class="value" id="noticeCount">-</div></div>
+                        <div class="statCard notice"><div class="label">총 조회수</div><div class="value" id="noticeViews">-</div></div>
+                    </div>
+                    <div class="linkRow"><a href="/notice">공지사항 목록 →</a></div>
+                </div>
+            </main>
+            <footer class="footer">
+                <div class="footerContent"><strong>HR Management System</strong><p>인사관리 시스템</p></div>
+                <div class="copyright">© 2026 HR Management System.</div>
+            </footer>
+        </div>
+    </section>
+    <script>
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                ['token','memberNo','userId','userEmail','userName','userRole'].forEach(k => localStorage.removeItem(k));
+                window.location.href = '/login';
+            }
+        }
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) { alert('로그인이 필요합니다.'); window.location.href = '/login'; return; }
+            const userName = localStorage.getItem('userName') || '사용자';
+            document.getElementById('userName').textContent = userName;
+            const userRole = localStorage.getItem('userRole');
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(el => el.classList.add('show'));
+            }
+            try {
+                const summaryRes = await fetch('/api/dashboard/summary');
+                const summary = await summaryRes.json();
+                if (summaryRes.ok) {
+                    document.getElementById('totalEmp').textContent = (summary.employeeCount || 0) + '명';
+                    document.getElementById('todayAttended').textContent = (summary.todayAttended ?? 0) + '명';
+                    document.getElementById('todayRate').textContent = (summary.todayAttendanceRate ?? 0) + '%';
+                }
+                const leaveRes = await fetch('/api/leave/all');
+                const leaveData = await leaveRes.json();
+                if (leaveRes.ok && leaveData.leaveRequests) {
+                    const list = leaveData.leaveRequests;
+                    document.getElementById('leaveApproved').textContent = list.filter(l => l.status === 'approved').length + '건';
+                    document.getElementById('leavePending').textContent = list.filter(l => l.status === 'pending').length + '건';
+                    document.getElementById('leaveRejected').textContent = list.filter(l => l.status === 'rejected').length + '건';
+                }
+                const noticeRes = await fetch('/api/notice/all');
+                const noticeData = await noticeRes.json();
+                if (noticeRes.ok && noticeData.notices) {
+                    const notices = noticeData.notices;
+                    document.getElementById('noticeCount').textContent = notices.length + '개';
+                    document.getElementById('noticeViews').textContent = (notices.reduce((s, n) => s + (n.viewCount || 0), 0)).toLocaleString();
+                }
+            } catch (e) { console.error(e); }
+        });
+    </script>
+</body>
+
+</html>

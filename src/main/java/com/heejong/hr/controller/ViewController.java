@@ -90,4 +90,9 @@ public class ViewController {
     public String salaryStatementPage() {
         return "salary-statement";
     }
+
+    @GetMapping("/statistics")
+    public String statisticsPage() {
+        return "statistics";
+    }
 }

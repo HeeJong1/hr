@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/signup", "/withdraw", "/home", "/leave", "/leaveCalendar", "/mypage", "/admin/leave", "/employee", "/attendance", "/attendance/statistics", "/salary", "/salary/statement", "/notice", "/noticeWrite", "/boss/dashboard", "/css/**", "/api/login", "/api/signup", "/api/withdraw", "/api/leave/**", "/api/employees/**", "/api/attendance/**", "/api/salary/**", "/api/notice/**", "/login/oauth2/**", "/oauth2/**").permitAll()
+                .requestMatchers("/", "/login", "/signup", "/withdraw", "/home", "/leave", "/leaveCalendar", "/mypage", "/admin/leave", "/employee", "/attendance", "/attendance/statistics", "/salary", "/salary/statement", "/notice", "/noticeWrite", "/boss/dashboard", "/statistics", "/css/**", "/api/login", "/api/signup", "/api/withdraw", "/api/leave/**", "/api/employees/**", "/api/attendance/**", "/api/salary/**", "/api/notice/**", "/api/dashboard/**", "/api/notifications/**", "/api/members/**", "/login/oauth2/**", "/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

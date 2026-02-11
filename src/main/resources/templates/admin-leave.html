@@ -6,257 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>연차 승인 관리</title>
     <link rel="stylesheet" href="/css/layout.css">
-    <style>
-        .leaveCard {
-            background-color: #f5f5f5;
-            border-radius: clamp(8px, 2vw, 12px);
-            padding: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .leaveCard h3 {
-            color: #333;
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .filterTabs {
-            display: flex;
-            gap: clamp(0.5rem, 2vw, 1rem);
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            flex-wrap: wrap;
-        }
-
-        .filterTab {
-            padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
-            background-color: white;
-            border: 2px solid #ddd;
-            border-radius: clamp(4px, 1vw, 6px);
-            cursor: pointer;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .filterTab:hover {
-            background-color: #f8f9fa;
-        }
-
-        .filterTab.active {
-            background-color: #3498db;
-            color: white;
-            border-color: #3498db;
-        }
-
-        .leaveTable {
-            width: 100%;
-            background-color: white;
-            border-radius: clamp(6px, 1vw, 8px);
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .leaveTable table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .leaveTable th,
-        .leaveTable td {
-            padding: clamp(0.75rem, 2vw, 1rem);
-            text-align: left;
-            border-bottom: 1px solid #ecf0f1;
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-        }
-
-        .leaveTable th {
-            background-color: #34495e;
-            color: white;
-            font-weight: 600;
-        }
-
-        .leaveTable tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .statusBadge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: clamp(0.75rem, 2vw, 0.85rem);
-            font-weight: 600;
-        }
-
-        .statusBadge.pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .statusBadge.approved {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .statusBadge.rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .actionButtons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btnApprove,
-        .btnReject,
-        .btnView {
-            padding: 0.4rem 0.8rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btnApprove {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btnApprove:hover {
-            background-color: #218838;
-        }
-
-        .btnReject {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .btnReject:hover {
-            background-color: #c82333;
-        }
-
-        .btnView {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btnView:hover {
-            background-color: #5a6268;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modalContent {
-            background-color: white;
-            padding: clamp(1.5rem, 4vw, 2rem);
-            border-radius: clamp(8px, 2vw, 12px);
-            max-width: clamp(300px, 90vw, 500px);
-            width: 100%;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .modalHeader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modalHeader h3 {
-            margin: 0;
-            color: #333;
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .closeBtn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #999;
-        }
-
-        .modalBody {
-            margin-bottom: 1.5rem;
-        }
-
-        .formGroup {
-            margin-bottom: 1rem;
-        }
-
-        .formGroup label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #555;
-            font-weight: 500;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-        }
-
-        .formGroup textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .formGroup textarea:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .modalFooter {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: flex-end;
-        }
-
-        .btnCancel {
-            padding: 0.75rem 1.5rem;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .btnSubmit {
-            padding: 0.75rem 1.5rem;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            .leaveTable {
-                overflow-x: auto;
-            }
-
-            .actionButtons {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/admin-leave.css">
 </head>
 
 <body>
@@ -298,13 +48,9 @@
             <main class="content">
                 <!-- 필터 탭 -->
                 <div class="leaveCard">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                        <h3 style="margin: 0;">연차 신청 목록</h3>
-                        <button onclick="downloadExcel()"
-                            style="padding: 0.75rem 1.5rem; background-color: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.95rem;">
-                            📥 엑셀 다운로드
-                        </button>
+                    <div class="leaveCardHeader">
+                        <h3>연차 신청 목록</h3>
+                        <button type="button" class="btnExportExcel" onclick="downloadExcel()">📥 엑셀 다운로드</button>
                     </div>
                     <div class="filterTabs">
                         <button class="filterTab active" onclick="filterByStatus('all')">전체</button>
@@ -351,7 +97,7 @@
     </section>
 
     <!-- 승인/반려 모달 -->
-    <div id="actionModal" class="modal">
+    <div id="actionModal" class="adminLeaveModal">
         <div class="modalContent">
             <div class="modalHeader">
                 <h3 id="modalTitle">연차 승인</h3>
@@ -407,7 +153,7 @@
             }
 
             // BOSS 권한 체크
-            if (userRole !== 'ROLE_BOSS') {
+            if (userRole !== 'ROLE_BOSS' && userRole !== 'boss' && userRole !== 'BOSS') {
                 alert('접근 권한이 없습니다.');
                 window.location.href = '/leave';
                 return;
@@ -417,10 +163,8 @@
             document.getElementById('userName').textContent = userName;
 
             // BOSS 메뉴 표시
-            if (userRole === 'ROLE_BOSS') {
-                document.querySelectorAll('.bossOnly').forEach(item => {
-                    item.classList.add('show');
-                });
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
+                document.querySelectorAll('.bossOnly').forEach(item => item.classList.add('show'));
             }
 
             // 연차 목록 로드

@@ -42,4 +42,10 @@ public interface NoticeMapper {
     
     // 페이징 처리된 검색 결과
     List<Notice> searchNoticesWithPaging(@Param("keyword") String keyword, @Param("offset") int offset, @Param("limit") int limit);
+
+    // 공지 읽음 등록
+    int insertNoticeRead(@Param("memberNo") Long memberNo, @Param("noticeNo") Long noticeNo);
+
+    // 회원이 읽은 공지 번호 목록
+    List<Long> findReadNoticeNosByMember(@Param("memberNo") Long memberNo);
 }

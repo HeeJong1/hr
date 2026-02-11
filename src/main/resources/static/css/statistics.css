@@ -1,0 +1,73 @@
+/* 통계 페이지 */
+
+.statSection {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.statSection h3 {
+    margin: 0 0 1rem 0;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
+.statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.statCard {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    border-left: 4px solid #3498db;
+}
+
+.statCard .label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.statCard .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.statCard.leave-approved {
+    border-left-color: #27ae60;
+}
+
+.statCard.leave-pending {
+    border-left-color: #f39c12;
+}
+
+.statCard.leave-rejected {
+    border-left-color: #e74c3c;
+}
+
+.statCard.notice {
+    border-left-color: #9b59b6;
+}
+
+.linkRow {
+    margin-top: 1rem;
+}
+
+.linkRow a {
+    color: #3498db;
+    text-decoration: none;
+    margin-right: 1rem;
+    font-size: 0.95rem;
+}
+
+.statisticsPage .headerUserLink {
+    color: #555;
+    text-decoration: none;
+}

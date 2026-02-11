@@ -1,0 +1,152 @@
+/* 휴가 캘린더 */
+
+.calendarCard {
+    background-color: #f5f5f5;
+    border-radius: clamp(8px, 2vw, 12px);
+    padding: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendarCard h3 {
+    color: #333;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+
+#calendar {
+    background-color: white;
+    border-radius: clamp(6px, 1vw, 8px);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendarPage .fc-event {
+    cursor: pointer;
+}
+
+.calendarPage .fc-daygrid-event {
+    white-space: normal !important;
+}
+
+.legendCard {
+    background-color: white;
+    border-radius: clamp(6px, 1vw, 8px);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    margin-top: clamp(1rem, 3vw, 1.5rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.legendCard h4 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+}
+
+.legendItems {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+}
+
+.legendColor {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.legend-annual {
+    background-color: #3498db;
+}
+
+.legend-half {
+    background-color: #f39c12;
+}
+
+.legend-sick {
+    background-color: #e74c3c;
+}
+
+.calendarModal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.calendarModal .modalContent {
+    background-color: white;
+    padding: clamp(1.5rem, 4vw, 2rem);
+    border-radius: clamp(8px, 2vw, 12px);
+    max-width: clamp(300px, 90vw, 500px);
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.calendarModal .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.calendarModal .modalHeader h3 {
+    margin: 0;
+    color: #333;
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+}
+
+.calendarModal .closeBtn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+}
+
+.calendarModal .modalBody {
+    margin-bottom: 1.5rem;
+}
+
+.detailRow {
+    display: flex;
+    margin-bottom: 1rem;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.detailLabel {
+    font-weight: 600;
+    color: #555;
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.detailValue {
+    color: #333;
+}
+
+@media (max-width: 768px) {
+    .calendarPage .fc-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .calendarPage .fc-toolbar-chunk {
+        margin: 0.25rem 0;
+    }
+}

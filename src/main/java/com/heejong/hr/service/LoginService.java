@@ -78,6 +78,14 @@ public class LoginService {
         }
     }
 
+    public Member getMemberByMemberNo(Long memberNo) {
+        Member member = loginMapper.findByMemberNo(memberNo);
+        if (member == null) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다");
+        }
+        return member;
+    }
+
     public void withdraw(String email, String password) {
         // 1. 사용자 조회
         Member member = loginMapper.findByEmail(email);
@@ -96,6 +104,41 @@ public class LoginService {
 
         if (result == 0) {
             throw new RuntimeException("회원탈퇴에 실패했습니다");
+        }
+    }
+
+    /**
+     * 프로필 수정 (이름, 연락처)
+     */
+    public void updateProfile(Long memberNo, String name, String phone) {
+        Member member = loginMapper.findByMemberNo(memberNo);
+        if (member == null) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다");
+        }
+        int result = loginMapper.updateProfile(memberNo, name != null ? name.trim() : member.getName(), phone);
+        if (result == 0) {
+            throw new RuntimeException("프로필 수정에 실패했습니다");
+        }
+    }
+
+    /**
+     * 비밀번호 변경
+     */
+    public void changePassword(Long memberNo, String currentPassword, String newPassword) {
+        Member member = loginMapper.findByMemberNo(memberNo);
+        if (member == null) {
+            throw new IllegalArgumentException("존재하지 않는 회원입니다");
+        }
+        if (!member.matchPassword(currentPassword)) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다");
+        }
+        if (newPassword == null || newPassword.length() < 4) {
+            throw new IllegalArgumentException("새 비밀번호는 4자 이상이어야 합니다");
+        }
+        String encoded = passwordEncoder.encode(newPassword);
+        int result = loginMapper.updatePassword(memberNo, encoded);
+        if (result == 0) {
+            throw new RuntimeException("비밀번호 변경에 실패했습니다");
         }
     }
 }

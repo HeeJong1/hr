@@ -6,115 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>마이페이지</title>
     <link rel="stylesheet" href="/css/layout.css">
-    <style>
-        .profileCard {
-            background-color: #f5f5f5;
-            border-radius: clamp(8px, 2vw, 12px);
-            padding: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .profileCard h3 {
-            color: #333;
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-            font-size: clamp(1.1rem, 3vw, 1.3rem);
-        }
-
-        .profileInfo {
-            display: flex;
-            flex-direction: column;
-            gap: clamp(1rem, 2vw, 1.5rem);
-        }
-
-        .infoRow {
-            display: flex;
-            align-items: center;
-            padding: clamp(0.75rem, 2vw, 1rem);
-            background-color: white;
-            border-radius: clamp(6px, 1vw, 8px);
-            border-left: 4px solid #3498db;
-        }
-
-        .infoLabel {
-            color: #7f8c8d;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            font-weight: 600;
-            min-width: clamp(80px, 20vw, 120px);
-        }
-
-        .infoValue {
-            color: #2c3e50;
-            font-size: clamp(0.95rem, 2vw, 1.1rem);
-        }
-
-        .passwordChange {
-            margin-top: clamp(1.5rem, 3vw, 2rem);
-        }
-
-        .formGroup {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-        }
-
-        .formGroup label {
-            margin-bottom: 0.5rem;
-            color: #555;
-            font-weight: 500;
-            font-size: clamp(0.9rem, 2vw, 1rem);
-        }
-
-        .formGroup input {
-            padding: clamp(0.75rem, 2vw, 1rem);
-            border: 2px solid #ddd;
-            border-radius: clamp(4px, 1vw, 6px);
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            background-color: white;
-            transition: border-color 0.3s ease;
-        }
-
-        .formGroup input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .btnChangePassword {
-            padding: clamp(0.875rem, 2vw, 1rem);
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: clamp(6px, 1vw, 8px);
-            font-size: clamp(0.95rem, 2vw, 1.1rem);
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btnChangePassword:hover {
-            background-color: #2980b9;
-        }
-
-        .message {
-            padding: clamp(0.75rem, 2vw, 1rem);
-            border-radius: clamp(6px, 1vw, 8px);
-            margin-bottom: clamp(1rem, 2vw, 1.5rem);
-            font-size: clamp(0.85rem, 2vw, 0.95rem);
-            display: none;
-        }
-
-        .message.error {
-            background-color: #ffe6e6;
-            color: #d32f2f;
-            border: 1px solid #ffcccc;
-        }
-
-        .message.success {
-            background-color: #e6f7e6;
-            color: #2e7d32;
-            border: 1px solid #ccf0cc;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/mypage.css">
 </head>
 
 <body>
@@ -157,29 +49,25 @@
                 <!-- 연차 현황 -->
                 <div class="profileCard">
                     <h3>내 연차 현황</h3>
-                    <div class="profileInfo"
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                        <div class="infoRow" style="flex-direction: column; align-items: flex-start;">
+                    <div class="profileInfo profileInfoGrid">
+                        <div class="infoRow infoRowColumn">
                             <span class="infoLabel">총 연차</span>
-                            <span class="infoValue" id="totalDays"
-                                style="font-size: clamp(1.3rem, 3vw, 1.5rem); color: #3498db;">-</span>
+                            <span class="infoValue" id="totalDays">-</span>
                         </div>
-                        <div class="infoRow" style="flex-direction: column; align-items: flex-start;">
+                        <div class="infoRow infoRowColumn">
                             <span class="infoLabel">사용한 연차</span>
-                            <span class="infoValue" id="usedDays"
-                                style="font-size: clamp(1.3rem, 3vw, 1.5rem); color: #e74c3c;">-</span>
+                            <span class="infoValue" id="usedDays">-</span>
                         </div>
-                        <div class="infoRow" style="flex-direction: column; align-items: flex-start;">
+                        <div class="infoRow infoRowColumn">
                             <span class="infoLabel">남은 연차</span>
-                            <span class="infoValue" id="remainingDays"
-                                style="font-size: clamp(1.3rem, 3vw, 1.5rem); color: #27ae60;">-</span>
+                            <span class="infoValue" id="remainingDays">-</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 프로필 정보 -->
                 <div class="profileCard">
-                    <h3>내 정보</h3>
+                    <h3>내 정보 <button type="button" id="btnEditProfile" class="btnEditProfile">수정</button></h3>
                     <div class="profileInfo">
                         <div class="infoRow">
                             <span class="infoLabel">아이디</span>
@@ -194,9 +82,32 @@
                             <span class="infoValue" id="userEmail">-</span>
                         </div>
                         <div class="infoRow">
+                            <span class="infoLabel">연락처</span>
+                            <span class="infoValue" id="userPhone">-</span>
+                        </div>
+                        <div class="infoRow">
                             <span class="infoLabel">직급</span>
                             <span class="infoValue" id="userRole">-</span>
                         </div>
+                    </div>
+                    <div id="profileEditForm" class="profileEditForm">
+                        <div class="formGroup">
+                            <label>이름</label>
+                            <input type="text" id="editName" placeholder="이름">
+                        </div>
+                        <div class="formGroup">
+                            <label>연락처</label>
+                            <input type="text" id="editPhone" placeholder="연락처">
+                        </div>
+                        <button type="button" class="btnSaveProfile">저장</button>
+                        <button type="button" class="btnCancelProfile">취소</button>
+                    </div>
+                </div>
+                <div class="profileCard">
+                    <h3>바로가기</h3>
+                    <div class="quickLinks">
+                        <a href="/attendance/statistics">내 출근 기록/통계</a>
+                        <a href="/salary/statement">내 월급 내역서</a>
                     </div>
                 </div>
 
@@ -291,14 +202,25 @@
             document.getElementById('userId').textContent = userId;
             document.getElementById('userEmail').textContent = userEmail;
 
+            if (memberNo) {
+                fetch(`/api/members/${memberNo}/profile`)
+                    .then(r => r.json())
+                    .then(profile => {
+                        if (profile.name) document.getElementById('userNameInfo').textContent = profile.name;
+                        if (profile.phone !== undefined) document.getElementById('userPhone').textContent = profile.phone || '-';
+                        document.getElementById('editName').value = profile.name || '';
+                        document.getElementById('editPhone').value = profile.phone || '';
+                    })
+                    .catch(() => { document.getElementById('userPhone').textContent = '-'; });
+            } else {
+                document.getElementById('userPhone').textContent = '-';
+            }
+
             // 직급 표시
             let roleText = 'USER';
-            if (userRole === 'ROLE_BOSS') {
+            if (userRole === 'boss' || userRole === 'ROLE_BOSS' || userRole === 'BOSS') {
                 roleText = 'BOSS';
-                // BOSS일 경우 관리자 메뉴 표시
-                document.querySelectorAll('.bossOnly').forEach(item => {
-                    item.classList.add('show');
-                });
+                document.querySelectorAll('.bossOnly').forEach(item => item.classList.add('show'));
             }
             document.getElementById('userRole').textContent = roleText;
 
@@ -324,23 +246,72 @@
             }
         }
 
+        // 프로필 수정 토글
+        document.getElementById('btnEditProfile').addEventListener('click', () => {
+            document.getElementById('profileEditForm').style.display = document.getElementById('profileEditForm').style.display === 'none' ? 'block' : 'none';
+        });
+        document.querySelector('.btnCancelProfile').addEventListener('click', () => {
+            document.getElementById('profileEditForm').style.display = 'none';
+        });
+        document.querySelector('.btnSaveProfile').addEventListener('click', async () => {
+            const memberNo = localStorage.getItem('memberNo');
+            if (!memberNo) return;
+            const name = document.getElementById('editName').value.trim();
+            const phone = document.getElementById('editPhone').value.trim();
+            try {
+                const res = await fetch(`/api/members/${memberNo}/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showMessage('프로필이 수정되었습니다.', 'success');
+                    document.getElementById('userNameInfo').textContent = name || document.getElementById('userNameInfo').textContent;
+                    document.getElementById('userPhone').textContent = phone || '-';
+                    document.getElementById('profileEditForm').style.display = 'none';
+                    localStorage.setItem('userName', name || localStorage.getItem('userName'));
+                } else {
+                    showMessage(data.message || '수정 실패', 'error');
+                }
+            } catch (e) {
+                showMessage('서버 연결에 실패했습니다.', 'error');
+            }
+        });
+
         // 비밀번호 변경 폼
         document.getElementById('passwordChangeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const memberNo = localStorage.getItem('memberNo');
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // 비밀번호 확인
             if (newPassword !== confirmPassword) {
                 showMessage('새 비밀번호가 일치하지 않습니다.', 'error');
                 return;
             }
+            if (!memberNo) {
+                showMessage('로그인 정보가 없습니다.', 'error');
+                return;
+            }
 
             try {
-                // TODO: API 구현
-                showMessage('비밀번호 변경 기능은 준비 중입니다.', 'error');
+                const res = await fetch(`/api/members/${memberNo}/password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showMessage('비밀번호가 변경되었습니다.', 'success');
+                    document.getElementById('currentPassword').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                } else {
+                    showMessage(data.message || '비밀번호 변경 실패', 'error');
+                }
             } catch (error) {
                 showMessage('서버 연결에 실패했습니다.', 'error');
                 console.error('Error:', error);
